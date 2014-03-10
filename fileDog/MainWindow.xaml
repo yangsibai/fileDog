@@ -1,0 +1,108 @@
+﻿<Controls:MetroWindow x:Class="fileDog.MainWindow"
+                      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+                      Title="FileDog" Height="700" Width="600" ResizeMode="NoResize"
+                      BorderThickness="1,0,1,1"
+                      BorderBrush="CadetBlue">
+    <Border Padding="10">
+        <DockPanel>
+            <Border Padding="0,0,10,0" BorderThickness="0,0,1,0" BorderBrush="CadetBlue" DockPanel.Dock="Left">
+                <StackPanel Orientation="Vertical" Width="200">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                        <Button x:Name="StartButton" Width="80" Margin="0,0,40,0" Style="{DynamicResource AccentedSquareButtonStyle}"
+                                Click="StartButton_OnClick">
+                            Start
+                        </Button>
+                        <Button x:Name="StopButton" Width="80" Click="StopButton_OnClick">stop</Button>
+                    </StackPanel>
+                    <TextBox Margin="0,0,0,5" Controls:TextboxHelper.Watermark="start url"
+                             Text="{Binding Path=StartURL}" />
+                    <TextBox Margin="0,0,0,5" TextWrapping="Wrap" AcceptsReturn="True" Height="72"
+                             VerticalScrollBarVisibility="Auto" />
+                    <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
+                        <Label>size(kb):</Label>
+                        <TextBox Width="50" />
+                        <Label>-</Label>
+                        <TextBox Width="50" />
+                    </StackPanel>
+                    <Label>file type:</Label>
+                    <ScrollViewer Height="250">
+                        <TreeView>
+                            <TreeView.Resources>
+                                <Style TargetType="{x:Type TreeViewItem}">
+                                    <Setter Property="HeaderTemplate">
+                                        <Setter.Value>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal">
+                                                    <CheckBox Name="chk" Margin="2" Tag="{Binding}" />
+                                                    <TextBlock Text="{Binding}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </TreeView.Resources>
+                            <TreeViewItem Header="image" IsExpanded="True">
+                                <TreeViewItem Header=".bmp" ToolTip="Bitmap Image File" />
+                                <TreeViewItem Header=".gif" ToolTip="Graphical Interchange Format File" />
+                                <TreeViewItem Header=".jpg" ToolTip="JPEG Image" />
+                                <TreeViewItem Header=".png" ToolTip="Portable Network Graphic" />
+                                <TreeViewItem Header=".psd" ToolTip="Adobe Photoshop Document" />
+                            </TreeViewItem>
+                            <TreeViewItem Header="text">
+                                <TreeViewItem Header=".doc" ToolTip="Microsoft Word Document" />
+                                <TreeViewItem Header=".docx" ToolTip="Microsoft Word Open XML Document" />
+                                <TreeViewItem Header=".txt" ToolTip="Plain Text File" />
+                            </TreeViewItem>
+                            <TreeViewItem Header="audio">
+                                <TreeViewItem Header=".mid" ToolTip="MIDI File" />
+                                <TreeViewItem Header=".mp3" ToolTip="MP3 Audio File" />
+                                <TreeViewItem Header=".wav" ToolTip="WAVE Audio File" />
+                                <TreeViewItem Header=".wma" ToolTip="Windows Media Audio File" />
+                            </TreeViewItem>
+                            <TreeViewItem Header="eBooks">
+                                <TreeViewItem Header=".azw" ToolTip="Amazon Kindle eBook File" />
+                                <TreeViewItem Header=".epub" ToolTip="Open eBook File" />
+                                <TreeViewItem Header=".mobi" ToolTip="Mobipocket eBook" />
+                            </TreeViewItem>
+                            <TreeViewItem Header="vector image">
+                                <TreeViewItem Header=".ai" ToolTip="Adobe Illustrator File" />
+                                <TreeViewItem Header=".eps" ToolTip="Encapsulated PostScript File" />
+                                <TreeViewItem Header=".ps" ToolTip="PostScript File" />
+                                <TreeViewItem Header=".svg" ToolTip="Scalable Vector Graphics File" />
+                            </TreeViewItem>
+                            <TreeViewItem Header="compressed">
+                                <TreeViewItem Header=".7z" ToolTip="7-Zip Compressed File" />
+                                <TreeViewItem Header=".rar" ToolTip="WinRAR Compressed Archive" />
+                                <TreeViewItem Header=".zip" ToolTip="Zipped File" />
+                            </TreeViewItem>
+                            <TreeViewItem Header="executable">
+                                <TreeViewItem Header=".apk" ToolTip="Android Package File" />
+                                <TreeViewItem Header=".bat" ToolTip="DOS Batch File" />
+                                <TreeViewItem Header=".exe" ToolTip="Windows Executable File" />
+                            </TreeViewItem>
+                        </TreeView>
+                    </ScrollViewer>
+                    <Controls:ToggleSwitch Header="rename file" />
+                    <Controls:ToggleSwitch Header="proxy" />
+                    <Button Width="30" Height="30" Style="{DynamicResource MetroCircleButtonStyle}">setting</Button>
+                </StackPanel>
+            </Border>
+            <StackPanel Orientation="Vertical" DockPanel.Dock="Right">
+                <TextBlock>sfdsadfdsafasdfasdfsadf</TextBlock>
+            </StackPanel>
+        </DockPanel>
+    </Border>
+    <Controls:MetroWindow.Flyouts>
+        <Controls:FlyoutsControl>
+            <Controls:Flyout Header="Flyout" Position="Right" Width="200">
+                <StackPanel Orientation="Vertical">
+                    <TextBox Controls:TextboxHelper.Watermark="host" />
+                    <TextBox Controls:TextboxHelper.Watermark="port" />
+                    <Button>save</Button>
+                </StackPanel>
+            </Controls:Flyout>
+        </Controls:FlyoutsControl>
+    </Controls:MetroWindow.Flyouts>
+</Controls:MetroWindow>
