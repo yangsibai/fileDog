@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using fileDog.Annotations;
@@ -12,6 +13,18 @@ namespace fileDog
     /// </summary>
     public class TaskConfig
     {
+        /// <summary>
+        /// 配置保存
+        /// </summary>
+        public static TaskConfig Config=new TaskConfig()
+        {
+            EnableProxy = false,
+            FileMaxSize = 1024,
+            FileMinSize = 20,
+            RenameFile = false,
+            StartURL = "http://tieba.baidu.com"
+        };
+
         /// <summary>
         /// 开始地址
         /// </summary>

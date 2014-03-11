@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 using MahApps.Metro.Controls;
 
 namespace fileDog
@@ -20,15 +21,23 @@ namespace fileDog
     /// </summary>
     public partial class MainWindow : MetroWindow
     {
-        private TaskConfig config = new TaskConfig()
-        {
-            StartURL = "http://www.ireadhome.com"
-        };
-
         public MainWindow()
         {
-            this.DataContext = config;
             InitializeComponent();
+            this.DataContext = TaskConfig.Config;
+            var t = new DispatcherTimer(TimeSpan.FromSeconds(1), DispatcherPriority.Normal, Tick, this.Dispatcher);
+        }
+
+        private void Tick(object sender, EventArgs e)
+        {
+            var dateTime = DateTime.Now;
+            MessageTextBlock.Text += dateTime+"\n";
+            var guid = Guid.NewGuid();
+            TaskStatusTransition.Content = new TextBlock
+            {
+                Text = guid.ToString(),
+                SnapsToDevicePixels = true
+            };
         }
 
         /// <summary>
@@ -39,7 +48,7 @@ namespace fileDog
         private void StartButton_OnClick(object sender, RoutedEventArgs e)
         {
 //            TaskConfig config = (TaskConfig) this.FindResource("Config");
-            MessageBox.Show("start url" + config.StartURL);
+            MessageBox.Show("start url" + TaskConfig.Config.StartURL);
         }
 
         /// <summary>

@@ -1,0 +1,114 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+
+namespace fileDog.Service
+{
+    /// <summary>
+    /// redis操作
+    /// </summary>
+    public static class Redis
+    {
+        private const string RedisHost = "127.0.0.1";
+        private const int RedisPort = 6379;
+        private const int db = 0;
+
+        /// <summary>
+        /// 静态构造，启动redis服务程序
+        /// </summary>
+        static Redis()
+        {
+            try
+            {
+                var conn = RedisConnectionGateway.Current.GetConnection();
+            }
+            catch (Exception e)
+            {
+                StartRedisServer();
+            }
+        }
+
+        /// <summary>
+        /// 启动Redis程序
+        /// </summary>
+        public static void StartRedisServer()
+        {
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Tools", "Redis_64", "redis-server.exe");
+            var startInfo = new ProcessStartInfo
+            {
+                CreateNoWindow = false,
+                UseShellExecute = false,
+                FileName = path,
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
+            Process.Start(startInfo);
+        }
+
+        /// <summary>
+        /// 添加一个地址
+        /// </summary>
+        /// <param name="url"></param>
+        public static void PushUrl(string url)
+        {
+            using (var conn = RedisConnectionGateway.Current.GetConnection())
+            {
+                conn.Open().Wait();
+                conn.Sets.Add(db, "urls", url);
+            }
+        }
+
+        /// <summary>
+        /// 获取一个地址
+        /// </summary>
+        /// <returns></returns>
+        public static string PopUrl()
+        {
+            using (var conn = RedisConnectionGateway.Current.GetConnection())
+            {
+                conn.Open().Wait();
+                var task= conn.Sets.GetRandom(db, "urls");
+                task.Wait();
+                if (task.Result != null && task.Result.Any())
+                {
+                    return Encoding.Default.GetString(task.Result);
+                }
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// push文件地址
+        /// </summary>
+        /// <param name="fileUrl"></param>
+        public static void PushFileUrl(string fileUrl)
+        {
+            using (var conn=RedisConnectionGateway.Current.GetConnection())
+            {
+                conn.Open().Wait();
+                conn.Sets.Add(db, "fileUrls", fileUrl);
+            }
+        }
+
+        /// <summary>
+        /// pop文件地址
+        /// </summary>
+        /// <returns></returns>
+        public static string PopFileUrl()
+        {
+            using (var conn=RedisConnectionGateway.Current.GetConnection())
+            {
+                conn.Open().Wait();
+                var task = conn.Sets.GetRandom(db, "fileUrls");
+                task.Wait();
+                if (task.Result != null && task.Result.Any())
+                {
+                    return Encoding.Default.GetString(task.Result);
+                }
+                return string.Empty;
+            }
+        }
+    }
+}
