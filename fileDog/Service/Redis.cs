@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace fileDog.Service
+namespace me.sibo.fileDog.Service
 {
     /// <summary>
     /// redis操作
@@ -61,6 +60,19 @@ namespace fileDog.Service
         }
 
         /// <summary>
+        /// 添加多个地址
+        /// </summary>
+        /// <param name="urls"></param>
+        public static void PushUrl(string[] urls)
+        {
+            using (var conn = RedisConnectionGateway.Current.GetConnection())
+            {
+                conn.Open().Wait();
+                conn.Sets.Add(db, "urls", urls);
+            }
+        }
+
+        /// <summary>
         /// 获取一个地址
         /// </summary>
         /// <returns></returns>
@@ -89,6 +101,19 @@ namespace fileDog.Service
             {
                 conn.Open().Wait();
                 conn.Sets.Add(db, "fileUrls", fileUrl);
+            }
+        }
+
+        /// <summary>
+        /// push多个文件地址
+        /// </summary>
+        /// <param name="fileUrls"></param>
+        public static void PushFileUrl(string[] fileUrls)
+        {
+            using (var conn = RedisConnectionGateway.Current.GetConnection())
+            {
+                conn.Open().Wait();
+                conn.Sets.Add(db, "fileUrls", fileUrls);
             }
         }
 

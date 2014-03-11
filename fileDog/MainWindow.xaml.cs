@@ -1,20 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Windows.Threading;
+using fileDog;
 using MahApps.Metro.Controls;
+using me.sibo.fileDog.Service;
 
-namespace fileDog
+namespace me.sibo.fileDog
 {
     /// <summary>
     /// MainWindow.xaml 的交互逻辑
@@ -47,8 +40,15 @@ namespace fileDog
         /// <param name="e"></param>
         private void StartButton_OnClick(object sender, RoutedEventArgs e)
         {
-//            TaskConfig config = (TaskConfig) this.FindResource("Config");
-            MessageBox.Show("start url" + TaskConfig.Config.StartURL);
+            MessageTextBlock.Text += "start at:" + TaskConfig.Config.StartURL;
+
+            var worker = new BackgroundWorker();
+            worker.DoWork += (sender1, args) => WebResolver.ResolverUrl(TaskConfig.Config.StartURL);
+            worker.RunWorkerCompleted += (sender2, args) =>
+            {
+                MessageTextBlock.Text += "resolve url complete";
+            };
+            worker.RunWorkerAsync();
         }
 
         /// <summary>

@@ -1,5 +1,5 @@
 ﻿using System;
-using fileDog.Service;
+using me.sibo.fileDog.Service;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace UnitTest

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text.RegularExpressions;
 
-namespace fileDog.Service
+namespace me.sibo.fileDog.Service
 {
     public static class WebResolver
     {
@@ -18,7 +18,7 @@ namespace fileDog.Service
             }
             if (string.IsNullOrEmpty(url)) return;
             var client = new WebClient();
-            client.DownloadStringCompleted += client_DownloadStringCompleted;
+            client.DownloadStringCompleted += downloadStringCompleted;
             client.DownloadStringAsync(new Uri(url));
         }
 
@@ -27,15 +27,15 @@ namespace fileDog.Service
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void client_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        private static void downloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
             if (e.Error != null) return;
 
             string pageContent = e.Result;
 
             var imList = new List<string>();
-            var regex = new Regex("src=('|\")([^\"']*)('|\")", RegexOptions.IgnoreCase);
-            MatchCollection matches = regex.Matches(pageContent);
+            var imgSrcRegex = new Regex("src=('|\")([^\"']*)('|\")", RegexOptions.IgnoreCase);
+            MatchCollection matches = imgSrcRegex.Matches(pageContent);
             foreach (Match match in matches)
             {
                 imList.Add(match.Groups[2].Value);
@@ -43,7 +43,7 @@ namespace fileDog.Service
 
             var hrefList = new List<string>();
             var hrefRegex = new Regex("href=('|\")([^\"']*)('|\")", RegexOptions.IgnoreCase);
-            MatchCollection hrefMatches = regex.Matches(pageContent);
+            MatchCollection hrefMatches = hrefRegex.Matches(pageContent);
             foreach (Match match in hrefMatches)
             {
                 hrefList.Add(match.Groups[2].Value);

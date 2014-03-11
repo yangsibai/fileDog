@@ -6,7 +6,7 @@
     <ProjectGuid>{C2636449-1520-4913-A73F-6B10BF72EDE5}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UnitTest</RootNamespace>
+    <RootNamespace>me.sibo.fileDog.UnitTest</RootNamespace>
     <AssemblyName>UnitTest</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>

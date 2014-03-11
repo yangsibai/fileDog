@@ -7,7 +7,7 @@
     <ProjectGuid>{2D0ADF56-C301-48A0-AE6F-F8C730A3C1BD}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>fileDog</RootNamespace>
+    <RootNamespace>me.sibo.fileDog</RootNamespace>
     <AssemblyName>fileDog</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -63,6 +63,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\FileCategory.cs" />
+    <Compile Include="Model\FileType.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Service\Redis.cs" />
     <Compile Include="Service\RedisConnectionGateway.cs" />

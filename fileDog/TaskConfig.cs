@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using fileDog.Annotations;
 
-namespace fileDog
+namespace me.sibo.fileDog
 {
     /// <summary>
     /// 任务设置
