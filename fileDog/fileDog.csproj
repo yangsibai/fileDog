@@ -115,7 +115,7 @@
     <Content Include="Tools\Redis_64\redis-check-dump.exe" />
     <Content Include="Tools\Redis_64\redis-cli.exe" />
     <Content Include="Tools\Redis_64\redis-server.exe">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -18,43 +18,36 @@ namespace me.sibo.fileDog.Service
             }
             if (string.IsNullOrEmpty(url)) return;
             var client = new WebClient();
-            client.DownloadStringCompleted += downloadStringCompleted;
-            client.DownloadStringAsync(new Uri(url));
-        }
+            var pageContent = client.DownloadString(new Uri(url));
 
-        /// <summary>
-        ///     处理下载后的内容
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void downloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
-        {
-            if (e.Error != null) return;
 
-            string pageContent = e.Result;
+            var fileList = new List<string>();
+            var urlList = new List<string>();
 
-            var imList = new List<string>();
             var imgSrcRegex = new Regex("src=('|\")([^\"']*)('|\")", RegexOptions.IgnoreCase);
             MatchCollection matches = imgSrcRegex.Matches(pageContent);
             foreach (Match match in matches)
             {
-                imList.Add(match.Groups[2].Value);
+                fileList.Add(match.Groups[2].Value);
             }
 
-            var hrefList = new List<string>();
             var hrefRegex = new Regex("href=('|\")([^\"']*)('|\")", RegexOptions.IgnoreCase);
             MatchCollection hrefMatches = hrefRegex.Matches(pageContent);
             foreach (Match match in hrefMatches)
             {
-                hrefList.Add(match.Groups[2].Value);
+                urlList.Add(match.Groups[2].Value);
             }
+            System.Console.WriteLine(fileList.Count);
+            System.Console.WriteLine(urlList.Count);
+            Redis.PushFileUrl(fileList.ToArray());
+            Redis.PushUrl(urlList.ToArray());
         }
 
         /// <summary>
         /// 下载文件
         /// </summary>
         /// <param name="fileUrl"></param>
-        public static void DownloadFile(string fileUrl)
+        public static void DownloadFile(string fileUrl="")
         {
             if (string.IsNullOrEmpty(fileUrl))
             {

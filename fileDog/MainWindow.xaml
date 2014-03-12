@@ -90,7 +90,9 @@
                 </StackPanel>
             </Border>
             <StackPanel Orientation="Vertical" DockPanel.Dock="Right">
-                <TextBlock x:Name="MessageTextBlock" Height="580"></TextBlock>
+                <ScrollViewer>
+                    <TextBlock x:Name="MessageTextBlock" Height="580"></TextBlock>
+                </ScrollViewer>
                 <Controls:TransitioningContentControl x:Name="TaskStatusTransition"
                                                   Width="350"
                                                   Height="30"
