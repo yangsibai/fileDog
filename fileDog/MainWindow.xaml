@@ -2,7 +2,7 @@
                       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
-                      Title="FileDog" Height="700" Width="600" ResizeMode="NoResize"
+                      Title="FileDog" Height="700" Width="600" ResizeMode="CanResize"
                       BorderThickness="1,0,1,1"
                       BorderBrush="CadetBlue">
     <Border Padding="10">
@@ -10,7 +10,8 @@
             <Border Padding="0,0,10,0" BorderThickness="0,0,1,0" BorderBrush="CadetBlue" DockPanel.Dock="Left">
                 <StackPanel Orientation="Vertical" Width="200">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                        <Button x:Name="StartButton" Width="80" Margin="0,0,40,0" Style="{DynamicResource AccentedSquareButtonStyle}"
+                        <Button x:Name="StartButton" Width="80" Margin="0,0,40,0"
+                                Style="{DynamicResource AccentedSquareButtonStyle}"
                                 Click="StartButton_OnClick">
                             Start
                         </Button>
@@ -22,9 +23,9 @@
                              VerticalScrollBarVisibility="Auto" />
                     <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
                         <Label>size(kb):</Label>
-                        <TextBox Width="50" Text="{Binding Path=FileMinSize}" TextAlignment="Right"/>
+                        <TextBox Width="50" Text="{Binding Path=FileMinSize}" TextAlignment="Right" />
                         <Label>-</Label>
-                        <TextBox Width="50" Text="{Binding Path=FileMaxSize}" TextAlignment="Right"/>
+                        <TextBox Width="50" Text="{Binding Path=FileMaxSize}" TextAlignment="Right" />
                     </StackPanel>
                     <Label>file type:</Label>
                     <ScrollViewer Height="250">
@@ -84,38 +85,38 @@
                             </TreeViewItem>
                         </TreeView>
                     </ScrollViewer>
-                    <Controls:ToggleSwitch Header="rename file" IsChecked="{Binding Path=RenameFile}"/>
-                    <Controls:ToggleSwitch Header="proxy" IsChecked="{Binding Path=EnableProxy}"/>
+                    <Controls:ToggleSwitch Header="rename file" IsChecked="{Binding Path=RenameFile}" />
+                    <Controls:ToggleSwitch Header="proxy" IsChecked="{Binding Path=EnableProxy}" />
                     <Button Width="30" Height="30" Style="{DynamicResource MetroCircleButtonStyle}">setting</Button>
                 </StackPanel>
             </Border>
             <StackPanel Orientation="Vertical" DockPanel.Dock="Right">
-                <ScrollViewer>
-                    <TextBlock x:Name="MessageTextBlock" Height="580"></TextBlock>
+                <ScrollViewer x:Name="_messageScrollViewer" Height="670">
+                <TextBlock x:Name="MessageTextBlock" TextWrapping="Wrap"/>
                 </ScrollViewer>
                 <Controls:TransitioningContentControl x:Name="TaskStatusTransition"
-                                                  Width="350"
-                                                  Height="30"
-                                                  Margin="0, 10, 0, 0"
-                                                  Transition="Custom">
+                                                      Width="350"
+                                                      Height="30"
+                                                      Margin="0, 10, 0, 0"
+                                                      Transition="Custom">
                     <Controls:TransitioningContentControl.CustomVisualStates>
                         <VisualState x:Name="CustomTransition">
                             <Storyboard>
                                 <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
-                                                           Storyboard.TargetName="CurrentContentPresentationSite"
-                                                           Storyboard.TargetProperty="(UIElement.Opacity)">
+                                                               Storyboard.TargetName="CurrentContentPresentationSite"
+                                                               Storyboard.TargetProperty="(UIElement.Opacity)">
                                     <SplineDoubleKeyFrame KeyTime="00:00:00"
-                                                      Value="0" />
+                                                          Value="0" />
                                     <SplineDoubleKeyFrame KeyTime="00:00:00.700"
-                                                      Value="1" />
+                                                          Value="1" />
                                 </DoubleAnimationUsingKeyFrames>
                                 <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
-                                                           Storyboard.TargetName="PreviousContentPresentationSite"
-                                                           Storyboard.TargetProperty="(UIElement.Opacity)">
+                                                               Storyboard.TargetName="PreviousContentPresentationSite"
+                                                               Storyboard.TargetProperty="(UIElement.Opacity)">
                                     <SplineDoubleKeyFrame KeyTime="00:00:00"
-                                                      Value="1" />
+                                                          Value="1" />
                                     <SplineDoubleKeyFrame KeyTime="00:00:00.700"
-                                                      Value="0" />
+                                                          Value="0" />
                                 </DoubleAnimationUsingKeyFrames>
                             </Storyboard>
                         </VisualState>

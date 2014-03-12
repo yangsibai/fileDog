@@ -43,6 +43,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\MahApps.Metro.0.12.1.0\lib\net40\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -65,6 +66,7 @@
     </ApplicationDefinition>
     <Compile Include="Model\FileCategory.cs" />
     <Compile Include="Model\FileType.cs" />
+    <Compile Include="Model\Feedback.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Service\Redis.cs" />
     <Compile Include="Service\RedisConnectionGateway.cs" />

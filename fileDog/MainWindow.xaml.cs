@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using MahApps.Metro.Controls;
+using me.sibo.fileDog.Model;
 using me.sibo.fileDog.Service;
 
 namespace me.sibo.fileDog
@@ -18,25 +20,36 @@ namespace me.sibo.fileDog
         {
             InitializeComponent();
             DataContext = TaskConfig.Config;
-            t1 = new DispatcherTimer(TimeSpan.FromSeconds(5), DispatcherPriority.Normal, Tick1, Dispatcher);
-            t2 = new DispatcherTimer(TimeSpan.FromSeconds(10), DispatcherPriority.Normal, Tick2, Dispatcher);
+            t1=new DispatcherTimer();
+            t1.Tick += Tick1;
+            t1.Interval = TimeSpan.FromSeconds(5);
+
+            t2=new DispatcherTimer();
+            t2.Tick += Tick2;
+            t2.Interval = TimeSpan.FromSeconds(5);
         }
 
         private void Tick1(object sender, EventArgs e)
         {
             MessageTextBlock.Text += "到了该执行的时候了\n";
-            var worker = new BackgroundWorker();
-            worker.DoWork += (sender1, args) => WebResolver.ResolverUrl();
-            worker.RunWorkerCompleted += (sender2, args2) => { MessageTextBlock.Text += "complete one url"; };
+
+            var task = Task.Factory.StartNew(() => WebResolver.ResolverUrl()).ContinueWith(cont =>
+            {
+                MessageTextBlock.Text += cont.Result.Message + "\n";
+                _messageScrollViewer.ScrollToEnd();
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
 
         private void Tick2(object sender, EventArgs e)
         {
             MessageTextBlock.Text += "到了该执行download的时候了\n";
-            var worker = new BackgroundWorker();
-            worker.DoWork += (sen1, arg1) => WebResolver.DownloadFile();
-            worker.RunWorkerCompleted += (sen2, arg2) => { MessageTextBlock.Text += "downloaded one url"; };
+
+            var task = Task.Factory.StartNew(() => WebResolver.DownloadFile()).ContinueWith(cont =>
+            {
+                MessageTextBlock.Text += cont.Result.Message + "\n";
+                _messageScrollViewer.ScrollToEnd();
+            },TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         /// <summary>
@@ -46,17 +59,17 @@ namespace me.sibo.fileDog
         /// <param name="e"></param>
         private void StartButton_OnClick(object sender, RoutedEventArgs e)
         {
-            MessageTextBlock.Text += "start at:" + TaskConfig.Config.StartURL;
+            MessageTextBlock.Text += "start at:" + TaskConfig.Config.StartURL+"\n";
 
-            var worker = new BackgroundWorker();
-            worker.DoWork += (sender1, args) => WebResolver.ResolverUrl(TaskConfig.Config.StartURL);
-            worker.RunWorkerCompleted += (sender2, args) =>
+            var task = Task.Factory.StartNew(() => WebResolver.ResolverUrl(TaskConfig.Config.StartURL));
+
+            task.ContinueWith(continuation =>
             {
-                MessageTextBlock.Text += "resolve url complete";
+                MessageTextBlock.Text += continuation.Result.Message;
+                _messageScrollViewer.ScrollToEnd();
                 t1.Start();
                 t2.Start();
-            };
-            worker.RunWorkerAsync();
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         /// <summary>

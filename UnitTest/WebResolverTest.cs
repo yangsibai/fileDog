@@ -19,5 +19,11 @@ namespace UnitTest
             var path = "http://www.ireadhome.com/Content/Images/Home/iNote.png";
             WebResolver.DownloadFile(path);;
         }
+
+        [TestMethod]
+        public void DownloadTest2()
+        {
+            WebResolver.DownloadFile(); ;
+        }
     }
 }
