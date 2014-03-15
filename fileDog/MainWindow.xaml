@@ -4,7 +4,8 @@
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       Title="FileDog" Height="700" Width="600" ResizeMode="CanResize"
                       BorderThickness="1,0,1,1"
-                      BorderBrush="CadetBlue">
+                      BorderBrush="CadetBlue"
+                      Closing="MainWindow_OnClosing">
     <Border Padding="10">
         <DockPanel>
             <Border Padding="0,0,10,0" BorderThickness="0,0,1,0" BorderBrush="CadetBlue" DockPanel.Dock="Left">

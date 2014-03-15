@@ -16,37 +16,6 @@ namespace me.sibo.fileDog.Service
         private const int db = 0;
 
         /// <summary>
-        /// 静态构造，启动redis服务程序
-        /// </summary>
-        static Redis()
-        {
-            try
-            {
-                var conn = RedisConnectionGateway.Current.GetConnection();
-            }
-            catch (Exception e)
-            {
-                StartRedisServer();
-            }
-        }
-
-        /// <summary>
-        /// 启动Redis程序
-        /// </summary>
-        public static void StartRedisServer()
-        {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Tools", "Redis_64", "redis-server.exe");
-            var startInfo = new ProcessStartInfo
-            {
-                CreateNoWindow = false,
-                UseShellExecute = false,
-                FileName = path,
-                WindowStyle = ProcessWindowStyle.Hidden
-            };
-            Process.Start(startInfo);
-        }
-
-        /// <summary>
         /// 添加一个地址
         /// </summary>
         /// <param name="url"></param>

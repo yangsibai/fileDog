@@ -13,7 +13,7 @@ namespace me.sibo.fileDog.Service
         /// <summary>
         ///     解析对应的地址
         /// </summary>
-        public static Feedback ResolverUrl(string url = "")
+        public static Feedback ResolveUrl(string url = "")
         {
             try
             {

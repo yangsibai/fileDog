@@ -10,7 +10,7 @@ namespace UnitTest
         [TestMethod]
         public void ResolveUrl()
         {
-            WebResolver.ResolverUrl("http://www.baidu.com");
+            WebResolver.ResolveUrl("http://www.baidu.com");
         }
 
         [TestMethod]

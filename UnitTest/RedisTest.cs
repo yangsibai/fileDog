@@ -14,11 +14,5 @@ namespace UnitTest
             var result = Redis.PopUrl();
             Assert.IsTrue(!string.IsNullOrEmpty(result));
         }
-
-        [TestMethod]
-        public void StartRedisServer()
-        {
-            Redis.StartRedisServer();
-        }
     }
 }
