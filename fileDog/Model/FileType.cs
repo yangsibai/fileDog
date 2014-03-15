@@ -18,6 +18,11 @@
         /// <summary>
         /// 简单介绍
         /// </summary>
-        public string Summary { get; set; }
+        public string Description { get; set; }
+
+        /// <summary>
+        /// 是否选中
+        /// </summary>
+        public bool Check { get; set; }
     }
 }

@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Threading;
 using MahApps.Metro.Controls;
+using me.sibo.fileDog.Model;
 using me.sibo.fileDog.Service;
+using Newtonsoft.Json;
 
 namespace me.sibo.fileDog
 {
@@ -17,12 +21,13 @@ namespace me.sibo.fileDog
     {
         private readonly DispatcherTimer t1;
         private readonly DispatcherTimer t2;
-        private readonly Process _redisProc = null;
+        private readonly Process _redisProc = null; 
 
         public MainWindow()
         {
             InitializeComponent();
             DataContext = TaskConfig.Config;
+
             t1 = new DispatcherTimer();
             t1.Tick += BeginResolveURL;
             t1.Interval = TimeSpan.FromSeconds(5);
@@ -31,15 +36,20 @@ namespace me.sibo.fileDog
             t2.Tick += BeginDownloadFile;
             t2.Interval = TimeSpan.FromSeconds(5);
 
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Tools", "Redis_64", "redis-server.exe");
+            var redisPath = Path.Combine(Directory.GetCurrentDirectory(), "Source", "Redis_64", "redis-server.exe");
             var startInfo = new ProcessStartInfo
             {
                 CreateNoWindow = true,
                 UseShellExecute = false,
-                FileName = path,
+                FileName = redisPath,
                 WindowStyle = ProcessWindowStyle.Hidden,
             };
             _redisProc = Process.Start(startInfo);
+
+            var categoriesFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Source", "fileCategories.json");
+            string jsonContent = File.ReadAllText(categoriesFilePath);
+            TaskConfig.Config.FileCategories = JsonConvert.DeserializeObject <List<FileCategory>>(jsonContent);
+            Console.WriteLine(jsonContent);
         }
 
         /// <summary>
@@ -52,7 +62,7 @@ namespace me.sibo.fileDog
             Task.Factory.StartNew(() => WebResolver.ResolveUrl()).ContinueWith(cont =>
             {
                 ShowMessage(cont.Result.Message);
-                _messageScrollViewer.ScrollToEnd();
+                MessageScrollViewer.ScrollToEnd();
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -66,7 +76,7 @@ namespace me.sibo.fileDog
             Task.Factory.StartNew(() => WebResolver.DownloadFile()).ContinueWith(cont =>
             {
                 ShowMessage(cont.Result.Message);
-                _messageScrollViewer.ScrollToEnd();
+                MessageScrollViewer.ScrollToEnd();
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -117,7 +127,19 @@ namespace me.sibo.fileDog
         /// <param name="e"></param>
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
-            _redisProc.Kill(); //退出redis
+            try
+            {
+                _redisProc.Kill(); //退出redis
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(exception.Message);
+            }
+        }
+
+        private void Test(object sender, RoutedEventArgs e)
+        {
+            ShowMessage(TaskConfig.GetFileExtensions());
         }
     }
 }

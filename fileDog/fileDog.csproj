@@ -41,6 +41,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\MahApps.Metro.0.12.1.0\lib\net40\MahApps.Metro.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Web" />
@@ -103,20 +106,23 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Source\fileCategories.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
-    <None Include="Tools\Redis_64\dump.rdb" />
+    <None Include="Source\Redis_64\dump.rdb" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Tools\Redis_64\redis-benchmark.exe" />
-    <Content Include="Tools\Redis_64\redis-check-aof.exe" />
-    <Content Include="Tools\Redis_64\redis-check-dump.exe" />
-    <Content Include="Tools\Redis_64\redis-cli.exe" />
-    <Content Include="Tools\Redis_64\redis-server.exe">
+    <Content Include="Source\Redis_64\redis-benchmark.exe" />
+    <Content Include="Source\Redis_64\redis-check-aof.exe" />
+    <Content Include="Source\Redis_64\redis-check-dump.exe" />
+    <Content Include="Source\Redis_64\redis-cli.exe" />
+    <Content Include="Source\Redis_64\redis-server.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
