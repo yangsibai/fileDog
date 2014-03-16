@@ -21,20 +21,20 @@ namespace me.sibo.fileDog
     {
         private readonly DispatcherTimer t1;
         private readonly DispatcherTimer t2;
-        private readonly Process _redisProc = null; 
+        private readonly Process _redisProc = null;
 
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = TaskConfig.Config;
+            DataContext = TaskConfig.GetInstance();
 
             t1 = new DispatcherTimer();
             t1.Tick += BeginResolveURL;
-            t1.Interval = TimeSpan.FromSeconds(5);
+            t1.Interval = TimeSpan.FromSeconds(3);
 
             t2 = new DispatcherTimer();
             t2.Tick += BeginDownloadFile;
-            t2.Interval = TimeSpan.FromSeconds(5);
+            t2.Interval = TimeSpan.FromSeconds(2);
 
             var redisPath = Path.Combine(Directory.GetCurrentDirectory(), "Source", "Redis_64", "redis-server.exe");
             var startInfo = new ProcessStartInfo
@@ -45,11 +45,6 @@ namespace me.sibo.fileDog
                 WindowStyle = ProcessWindowStyle.Hidden,
             };
             _redisProc = Process.Start(startInfo);
-
-            var categoriesFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Source", "fileCategories.json");
-            string jsonContent = File.ReadAllText(categoriesFilePath);
-            TaskConfig.Config.FileCategories = JsonConvert.DeserializeObject <List<FileCategory>>(jsonContent);
-            Console.WriteLine(jsonContent);
         }
 
         /// <summary>
@@ -87,9 +82,9 @@ namespace me.sibo.fileDog
         /// <param name="e"></param>
         private void StartButton_OnClick(object sender, RoutedEventArgs e)
         {
-            ShowMessage("start at:" + TaskConfig.Config.StartURL);
+            ShowMessage("start at:" + TaskConfig.GetInstance().StartURL);
 
-            Task.Factory.StartNew(() => WebResolver.ResolveUrl(TaskConfig.Config.StartURL)).ContinueWith(continuation =>
+            Task.Factory.StartNew(() => WebResolver.ResolveUrl(TaskConfig.GetInstance().StartURL)).ContinueWith(continuation =>
             {
                 ShowMessage(continuation.Result.Message);
                 t1.Start();
@@ -133,13 +128,8 @@ namespace me.sibo.fileDog
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.Message);
+//                MessageBox.Show(exception.Message);
             }
-        }
-
-        private void Test(object sender, RoutedEventArgs e)
-        {
-            ShowMessage(TaskConfig.GetFileExtensions());
         }
     }
 }

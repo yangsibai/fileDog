@@ -1,33 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Configuration;
+using System.IO;
 using System.Linq;
-using fileDog.Annotations;
+using System.Text.RegularExpressions;
 using me.sibo.fileDog.Model;
+using Newtonsoft.Json;
 
 namespace me.sibo.fileDog
 {
     /// <summary>
     ///     任务设置
     /// </summary>
-    public class TaskConfig
+    public sealed class TaskConfig
     {
-        /// <summary>
-        ///     配置保存
-        /// </summary>
-        public static TaskConfig Config = new TaskConfig
+        private static readonly object Lock = new object();
+        private static TaskConfig _instance;
+
+        private TaskConfig()
         {
-            EnableProxy = false,
-            FileMaxSize = 1024,
-            FileMinSize = 20,
-            RenameFile = false,
-            StartURL = "http://tieba.baidu.com"
-        };
+            
+        }
+
+        public static TaskConfig GetInstance()
+        {
+            if (_instance == null)
+            {
+                lock (Lock)
+                {
+                    if (_instance == null)
+                    {
+                        var configFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Source", "config.json");
+                        string configJson = File.ReadAllText(configFilePath);
+                        _instance = JsonConvert.DeserializeObject<TaskConfig>(configJson);
+                    }
+                }
+            }
+            return _instance;
+        }
 
         /// <summary>
         ///     开始地址
         /// </summary>
         public String StartURL { get; set; }
+
+        /// <summary>
+        /// 匹配地址
+        /// </summary>
+        public string MatchURL { get; set; }
 
         /// <summary>
         ///     min size
@@ -55,17 +75,29 @@ namespace me.sibo.fileDog
         public List<FileCategory> FileCategories { get; set; }
 
         /// <summary>
-        /// 获取所有选中的文件的后缀名
+        /// 获取匹配地址
         /// </summary>
         /// <returns></returns>
-        public static string GetFileExtensions()
+        public Regex URLPattern()
         {
-            string str = "";
-            if (Config != null)
+            return new Regex(MatchURL.Replace("\n","|"),RegexOptions.IgnoreCase);
+        }
+
+        /// <summary>
+        /// 获取文件路径匹配
+        /// </summary>
+        /// <returns></returns>
+        public Regex FilePattern()
+        {
+            var checkedFiles = new List<string>();
+            foreach (FileCategory fileCategory in _instance.FileCategories)
             {
-                str = Config.FileCategories.Aggregate(str, (current1, cat) => cat.FileTypes.Where(fileType => fileType.Check).Aggregate(current1, (current, fileType) => current + fileType.Extension));
+                checkedFiles.AddRange(from fileType in fileCategory.FileTypes
+                    where fileType.Check
+                    select fileType.Extension);
             }
-            return str.Replace(".","\\.");
+            var str="("+ String.Join("|", checkedFiles).Replace(".", "\\.")+")$";
+            return new Regex(str,RegexOptions.IgnoreCase);
         }
     }
 }

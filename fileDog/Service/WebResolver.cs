@@ -25,27 +25,32 @@ namespace me.sibo.fileDog.Service
                 var client = new WebClient();
                 var pageContent = client.DownloadString(new Uri(url));
 
-
-                var fileList = new List<string>();
-                var urlList = new List<string>();
-
+                var config = TaskConfig.GetInstance();
                 var imgSrcRegex = new Regex("src=('|\")([^\"']*)('|\")", RegexOptions.IgnoreCase);
                 MatchCollection matches = imgSrcRegex.Matches(pageContent);
 
+                var fileList = new List<string>();
                 Uri baseUri=new Uri(url);
                 Uri newUri;
                 foreach (Match match in matches)
                 {
                     newUri=new Uri(baseUri,match.Groups[2].Value);
-                    fileList.Add(newUri.AbsoluteUri);
+                    if (config.FilePattern().IsMatch(newUri.AbsoluteUri))
+                    {
+                        fileList.Add(newUri.AbsoluteUri);   
+                    }
                 }
 
                 var hrefRegex = new Regex("href=('|\")([^\"']*)('|\")", RegexOptions.IgnoreCase);
                 MatchCollection hrefMatches = hrefRegex.Matches(pageContent);
+                var urlList = new List<string>();
                 foreach (Match match in hrefMatches)
                 {
                     newUri = new Uri(baseUri, match.Groups[2].Value);
-                    urlList.Add(newUri.AbsoluteUri);
+                    if (config.URLPattern().IsMatch(newUri.AbsoluteUri))
+                    {
+                        urlList.Add(newUri.AbsoluteUri);                        
+                    }
                 }
                 Redis.PushFileUrl(fileList.ToArray());
                 Redis.PushUrl(urlList.ToArray());
@@ -61,14 +66,15 @@ namespace me.sibo.fileDog.Service
         /// <summary>
         /// 下载文件
         /// </summary>
-        /// <param name="fileUrl"></param>
-        public static Feedback DownloadFile(string fileUrl = "")
+        public static Feedback DownloadFile()
         {
             try
             {
+                var config = TaskConfig.GetInstance();
+                string fileUrl = Redis.PopFileUrl();
                 if (string.IsNullOrEmpty(fileUrl))
                 {
-                    fileUrl = Redis.PopFileUrl();
+                    return new Feedback("no file url");
                 }
 
                 WebRequest webRequest = HttpWebRequest.Create(fileUrl);
@@ -76,7 +82,26 @@ namespace me.sibo.fileDog.Service
                 using (WebResponse response = webRequest.GetResponse())
                 {
                     var contentLength = response.Headers.Get("content-length");
-                    return new Feedback(true, " size:" + contentLength+" url:" + fileUrl);
+                    int contentLengthByte;
+                    if (Int32.TryParse(contentLength, out contentLengthByte))
+                    {
+                        if (contentLengthByte >= config.FileMinSize * 1024 && contentLengthByte <= config.FileMaxSize*1024)
+                        {
+                            var fileSaveDir = Path.Combine(Directory.GetCurrentDirectory(), "Download");
+                            if (!Directory.Exists(fileSaveDir))
+                            {
+                                Directory.CreateDirectory(fileSaveDir);
+                            }
+                            var extension = Path.GetExtension(fileUrl).ToLower();
+                            var fileName = Guid.NewGuid().ToString() + extension;
+                            var filePath = Path.Combine(fileSaveDir, fileName);
+                            using (var client = new WebClient())
+                            {
+                                client.DownloadFileAsync(new Uri(fileUrl),filePath);
+                            }
+                        }
+                    }
+                    return new Feedback(false, " size:" + contentLength+" url:" + fileUrl);
                 }
             }
             catch (Exception e)

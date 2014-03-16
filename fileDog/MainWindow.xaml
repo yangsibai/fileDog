@@ -4,6 +4,7 @@
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:local="clr-namespace:me.sibo.fileDog.Model"
                       Title="FileDog" Height="700" Width="600" ResizeMode="CanResize"
+                      Icon="Source/dog.ico"
                       BorderThickness="1,0,1,1"
                       BorderBrush="CadetBlue"
                       Closing="MainWindow_OnClosing">
@@ -21,8 +22,8 @@
                     </StackPanel>
                     <TextBox Margin="0,0,0,5" Controls:TextboxHelper.Watermark="start url"
                              Text="{Binding Path=StartURL}" />
-                    <TextBox Margin="0,0,0,5" TextWrapping="Wrap" AcceptsReturn="True" Height="72"
-                             VerticalScrollBarVisibility="Auto" />
+                    <TextBox Margin="0,0,0,5" TextWrapping="Wrap" AcceptsReturn="True" Height="100"
+                             VerticalScrollBarVisibility="Auto" Text="{Binding Path=MatchURL}" />
                     <StackPanel Margin="0,0,0,5" Orientation="Horizontal">
                         <Label>size(kb):</Label>
                         <TextBox Width="50" Text="{Binding Path=FileMinSize}" TextAlignment="Right" />
@@ -51,43 +52,44 @@
                     <Controls:ToggleSwitch Header="proxy" IsChecked="{Binding Path=EnableProxy}" />
                     <StackPanel Orientation="Horizontal" Margin="0,10">
                         <Button Width="80" Margin="0,0,40,0">setting</Button>
-                        <Button Width="80" Click="Test">test</Button>
                     </StackPanel>
                 </StackPanel>
             </Border>
-            <StackPanel Orientation="Vertical" DockPanel.Dock="Right">
-                <ScrollViewer x:Name="MessageScrollViewer" Height="670">
-                <TextBlock x:Name="MessageTextBlock" TextWrapping="Wrap"/>
-                </ScrollViewer>
-                <Controls:TransitioningContentControl x:Name="TaskStatusTransition"
+            <Border Padding="10" DockPanel.Dock="Right">
+                <StackPanel Orientation="Vertical">
+                    <ScrollViewer x:Name="MessageScrollViewer" Height="670">
+                        <TextBlock x:Name="MessageTextBlock" TextWrapping="Wrap"/>
+                    </ScrollViewer>
+                    <Controls:TransitioningContentControl x:Name="TaskStatusTransition"
                                                       Width="350"
                                                       Height="30"
                                                       Margin="0, 10, 0, 0"
                                                       Transition="Custom">
-                    <Controls:TransitioningContentControl.CustomVisualStates>
-                        <VisualState x:Name="CustomTransition">
-                            <Storyboard>
-                                <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                        <Controls:TransitioningContentControl.CustomVisualStates>
+                            <VisualState x:Name="CustomTransition">
+                                <Storyboard>
+                                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
                                                                Storyboard.TargetName="CurrentContentPresentationSite"
                                                                Storyboard.TargetProperty="(UIElement.Opacity)">
-                                    <SplineDoubleKeyFrame KeyTime="00:00:00"
+                                        <SplineDoubleKeyFrame KeyTime="00:00:00"
                                                           Value="0" />
-                                    <SplineDoubleKeyFrame KeyTime="00:00:00.700"
+                                        <SplineDoubleKeyFrame KeyTime="00:00:00.700"
                                                           Value="1" />
-                                </DoubleAnimationUsingKeyFrames>
-                                <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
+                                    </DoubleAnimationUsingKeyFrames>
+                                    <DoubleAnimationUsingKeyFrames BeginTime="00:00:00"
                                                                Storyboard.TargetName="PreviousContentPresentationSite"
                                                                Storyboard.TargetProperty="(UIElement.Opacity)">
-                                    <SplineDoubleKeyFrame KeyTime="00:00:00"
+                                        <SplineDoubleKeyFrame KeyTime="00:00:00"
                                                           Value="1" />
-                                    <SplineDoubleKeyFrame KeyTime="00:00:00.700"
+                                        <SplineDoubleKeyFrame KeyTime="00:00:00.700"
                                                           Value="0" />
-                                </DoubleAnimationUsingKeyFrames>
-                            </Storyboard>
-                        </VisualState>
-                    </Controls:TransitioningContentControl.CustomVisualStates>
-                </Controls:TransitioningContentControl>
-            </StackPanel>
+                                    </DoubleAnimationUsingKeyFrames>
+                                </Storyboard>
+                            </VisualState>
+                        </Controls:TransitioningContentControl.CustomVisualStates>
+                    </Controls:TransitioningContentControl>
+                </StackPanel>
+            </Border>
         </DockPanel>
     </Border>
     <Controls:MetroWindow.Flyouts>

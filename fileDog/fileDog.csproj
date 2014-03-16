@@ -106,6 +106,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Source\config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="Source\fileCategories.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -118,6 +121,9 @@
     <None Include="Source\Redis_64\dump.rdb" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Source\dog.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
     <Content Include="Source\Redis_64\redis-benchmark.exe" />
     <Content Include="Source\Redis_64\redis-check-aof.exe" />
     <Content Include="Source\Redis_64\redis-check-dump.exe" />

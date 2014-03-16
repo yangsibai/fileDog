@@ -1,0 +1,155 @@
+﻿{
+	"StartURL": "http://tieba.baidu.com",
+	"MatchURL":"tieba.baidu.com\nfile.baidu.com",
+	"FileMinSize": 20,
+	"FileMaxSize": 10240,
+	"RenameFile": false,
+	"EnableProxy": false,
+	"FileCategories": [{
+		"Name": "image",
+		"FileTypes": [{
+			"Name": ".bmp",
+			"Extension": ".bmp",
+			"Check": false,
+			"Description": "Bitmap Image File"
+		}, {
+			"Name": ".gif",
+			"Extension": ".gif",
+			"Check": false,
+			"Description": "Graphical Interchange Format File"
+		}, {
+			"Name": ".jpg",
+			"Extension": ".jpg",
+			"Check": false,
+			"Description": "JPEG Image"
+		}, {
+			"Name": ".png",
+			"Extension": ".png",
+			"Check": false,
+			"Description": "Portable Network Graphic"
+		}, {
+			"Name": ".psd",
+			"Extension": ".psd",
+			"Check": false,
+			"Description": "Adobe Photoshop Document"
+		}]
+	}, {
+		"Name": "text",
+		"FileTypes": [{
+			"Name": ".doc",
+			"Extension": ".doc",
+			"Check": false,
+			"Description": "Microsoft Word Document"
+		}, {
+			"Name": ".docx",
+			"Extension": ".docx",
+			"Check": false,
+			"Description": "Microsoft Word Open XML Document"
+		}, {
+			"Name": ".txt",
+			"Extension": ".txt",
+			"Check": false,
+			"Description": "Plain Text File"
+		}]
+	}, {
+		"Name": "audio",
+		"FileTypes": [{
+			"Name": ".mid",
+			"Extension": ".mid",
+			"Check": false,
+			"Description": "MIDI File"
+		}, {
+			"Name": ".mp3",
+			"Extension": ".mp3",
+			"Check": false,
+			"Description": "MP3 Audio File"
+		}, {
+			"Name": ".wav",
+			"Extension": ".wav",
+			"Check": false,
+			"Description": "WAVE Audio File"
+		}, {
+			"Name": ".wma",
+			"Extension": ".wma",
+			"Check": false,
+			"Description": "Windows Media Audio File"
+		}]
+	}, {
+		"Name": "eBooks",
+		"FileTypes": [{
+			"Name": ".azw",
+			"Extension": ".azw",
+			"Check": false,
+			"Description": "Amazon Kindle eBook File"
+		}, {
+			"Name": ".epub",
+			"Extension": ".epub",
+			"Check": false,
+			"Description": "Open eBook File"
+		}, {
+			"Name": ".mobi",
+			"Extension": ".mobi",
+			"Check": false,
+			"Description": "Mobipocket eBook"
+		}]
+	}, {
+		"Name": "vector image",
+		"FileTypes": [{
+			"Name": ".ai",
+			"Extension": ".ai",
+			"Check": false,
+			"Description": "Adobe Illustrator File"
+		}, {
+			"Name": ".eps",
+			"Extension": ".eps",
+			"Check": false,
+			"Description": "Encapsulated PostScript File"
+		}, {
+			"Name": ".ps",
+			"Extension": ".ps",
+			"Check": false,
+			"Description": "PostScript File"
+		}, {
+			"Name": ".svg",
+			"Extension": ".svg",
+			"Check": false,
+			"Description": "Scalable Vector Graphics File"
+		}]
+	}, {
+		"Name": "compressed",
+		"FileTypes": [{
+			"Name": ".7z",
+			"Extension": ".7z",
+			"Check": false,
+			"Description": "7-Zip Compressed File"
+		}, {
+			"Name": ".rar",
+			"Extension": ".rar",
+			"Check": false,
+			"Description": "WinRAR Compressed Archive"
+		}, {
+			"Name": ".zip",
+			"Extension": ".zip",
+			"Check": false,
+			"Description": "Zipped File"
+		}]
+	}, {
+		"Name": "executable",
+		"FileTypes": [{
+			"Name": ".apk",
+			"Extension": ".apk",
+			"Check": false,
+			"Description": "Android Package File"
+		}, {
+			"Name": ".bat",
+			"Extension": ".bat",
+			"Check": false,
+			"Description": "DOS Batch File"
+		}, {
+			"Name": ".exe",
+			"Extension": ".exe",
+			"Check": false,
+			"Description": "Windows Executable File"
+		}]
+	}]
+}
