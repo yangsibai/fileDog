@@ -24,6 +24,9 @@ namespace me.sibo.fileDog
         private readonly DispatcherTimer t2;
         private readonly DispatcherTimer t3;
 
+        private bool isDownloading;
+        private bool isResolving;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -34,11 +37,11 @@ namespace me.sibo.fileDog
 
             t1 = new DispatcherTimer();
             t1.Tick += BeginResolveURL;
-            t1.Interval = TimeSpan.FromSeconds(3);
+            t1.Interval = TimeSpan.FromSeconds(1);
 
             t2 = new DispatcherTimer();
             t2.Tick += BeginDownloadFile;
-            t2.Interval = TimeSpan.FromSeconds(2);
+            t2.Interval = TimeSpan.FromSeconds(1);
 
             t3 = new DispatcherTimer();
             t3.Tick += GetTaskInfo;
@@ -62,8 +65,20 @@ namespace me.sibo.fileDog
         /// <param name="e"></param>
         private void BeginResolveURL(object sender, EventArgs e)
         {
-            Task.Factory.StartNew(() => WebResolver.ResolveUrl())
-                .ContinueWith(cont => ShowMessage(cont.Result), TaskScheduler.FromCurrentSynchronizationContext());
+            if (!isResolving)
+            {
+                isResolving = true;
+                Task.Factory.StartNew(() => WebResolver.ResolveUrl())
+                    .ContinueWith(cont =>
+                    {
+                        isResolving = false;
+                        ShowMessage(cont.Result);
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+            }
+            else
+            {
+                ShowMessage(MessageType.Infomation, "a url is resolving");
+            }
         }
 
         /// <summary>
@@ -73,8 +88,19 @@ namespace me.sibo.fileDog
         /// <param name="e"></param>
         private void BeginDownloadFile(object sender, EventArgs e)
         {
-            Task.Factory.StartNew(() => WebResolver.DownloadFile())
-                .ContinueWith(cont => ShowMessage(cont.Result), TaskScheduler.FromCurrentSynchronizationContext());
+            if (!isDownloading)
+            {
+                isDownloading = true;
+                Task.Factory.StartNew(() => WebResolver.DownloadFile()).ContinueWith(cont =>
+                {
+                    isDownloading = false;
+                    ShowMessage(cont.Result);
+                }, TaskScheduler.FromCurrentSynchronizationContext());
+            }
+            else
+            {
+                ShowMessage(MessageType.Infomation, "a file is downloading");
+            }
         }
 
         /// <summary>
@@ -189,6 +215,18 @@ namespace me.sibo.fileDog
             {
 //                MessageBox.Show(exception.Message);
             }
+        }
+
+        /// <summary>
+        ///     清理所有数据
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Clear(object sender, RoutedEventArgs e)
+        {
+            Task.Factory.StartNew(Redis.FlushDb)
+                .ContinueWith(cont => ShowMessage(MessageType.Infomation, "Clear All Data"),
+                    TaskScheduler.FromCurrentSynchronizationContext());
         }
     }
 }
