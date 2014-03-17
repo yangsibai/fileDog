@@ -1,6 +1,6 @@
 ﻿{
-	"StartURL": "http://tieba.baidu.com",
-	"MatchURL":"tieba.baidu.com\nfile.baidu.com",
+	"StartURL": "http://www.i7wu.cn/",
+	"MatchURL":"i7wu.cn",
 	"FileMinSize": 20,
 	"FileMaxSize": 10240,
 	"RenameFile": false,
@@ -10,27 +10,27 @@
 		"FileTypes": [{
 			"Name": ".bmp",
 			"Extension": ".bmp",
-			"Check": true,
+			"Check": false,
 			"Description": "Bitmap Image File"
 		}, {
 			"Name": ".gif",
 			"Extension": ".gif",
-			"Check": true,
+			"Check": false,
 			"Description": "Graphical Interchange Format File"
 		}, {
 			"Name": ".jpg",
 			"Extension": ".jpg",
-			"Check": true,
+			"Check": false,
 			"Description": "JPEG Image"
 		}, {
 			"Name": ".png",
 			"Extension": ".png",
-			"Check": true,
+			"Check": false,
 			"Description": "Portable Network Graphic"
 		}, {
 			"Name": ".psd",
 			"Extension": ".psd",
-			"Check": true,
+			"Check": false,
 			"Description": "Adobe Photoshop Document"
 		}]
 	}, {
@@ -48,7 +48,7 @@
 		}, {
 			"Name": ".txt",
 			"Extension": ".txt",
-			"Check": false,
+			"Check": true,
 			"Description": "Plain Text File"
 		}]
 	}, {
@@ -125,12 +125,12 @@
 		}, {
 			"Name": ".rar",
 			"Extension": ".rar",
-			"Check": false,
+			"Check": true,
 			"Description": "WinRAR Compressed Archive"
 		}, {
 			"Name": ".zip",
 			"Extension": ".zip",
-			"Check": false,
+			"Check": true,
 			"Description": "Zipped File"
 		}]
 	}, {
