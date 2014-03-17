@@ -13,7 +13,7 @@ namespace me.sibo.fileDog.Service
         /// <summary>
         ///     解析对应的地址
         /// </summary>
-        public static Feedback ResolveUrl(string url = "")
+        public static Result ResolveUrl(string url = "")
         {
             try
             {
@@ -21,7 +21,7 @@ namespace me.sibo.fileDog.Service
                 {
                     url = Redis.PopUrl();
                 }
-                if (string.IsNullOrEmpty(url)) return new Feedback("url is empty");
+                if (string.IsNullOrEmpty(url)) return new Result("url is empty");
                 var client = new WebClient();
                 var pageContent = client.DownloadString(new Uri(url));
 
@@ -54,19 +54,19 @@ namespace me.sibo.fileDog.Service
                 }
                 Redis.PushFileUrl(fileList.ToArray());
                 Redis.PushUrl(urlList.ToArray());
-                return new Feedback(true,
+                return new Result(true,
                     "success:" + url + " fileCount:" + fileList.Count + " urlCount:" + urlList.Count);
             }
             catch (Exception e)
             {
-                return new Feedback(e.Message);
+                return new Result(e.Message);
             }
         }
 
         /// <summary>
         /// 下载文件
         /// </summary>
-        public static Feedback DownloadFile()
+        public static Result DownloadFile()
         {
             try
             {
@@ -74,7 +74,7 @@ namespace me.sibo.fileDog.Service
                 string fileUrl = Redis.PopFileUrl();
                 if (string.IsNullOrEmpty(fileUrl))
                 {
-                    return new Feedback("no file url");
+                    return new Result("no file url");
                 }
 
                 WebRequest webRequest = HttpWebRequest.Create(fileUrl);
@@ -87,7 +87,9 @@ namespace me.sibo.fileDog.Service
                     {
                         if (contentLengthByte >= config.FileMinSize * 1024 && contentLengthByte <= config.FileMaxSize*1024)
                         {
-                            var fileSaveDir = Path.Combine(Directory.GetCurrentDirectory(), "Download");
+                            var startURL = TaskConfig.GetInstance().StartURL;
+
+                            var fileSaveDir = Path.Combine(Directory.GetCurrentDirectory(), new Uri(startURL).Host);
                             if (!Directory.Exists(fileSaveDir))
                             {
                                 Directory.CreateDirectory(fileSaveDir);
@@ -97,16 +99,18 @@ namespace me.sibo.fileDog.Service
                             var filePath = Path.Combine(fileSaveDir, fileName);
                             using (var client = new WebClient())
                             {
-                                client.DownloadFileAsync(new Uri(fileUrl),filePath);
+                                client.DownloadFile(new Uri(fileUrl),filePath);
+                                Redis.FileDownloaded(fileUrl);
+                                return new Result(true,"download "+fileUrl+" successfully");
                             }
                         }
                     }
-                    return new Feedback(false, " size:" + contentLength+" url:" + fileUrl);
+                    return new Result("not download:" + fileUrl);
                 }
             }
             catch (Exception e)
             {
-                return new Feedback(e.Message);
+                return new Result(e.Message);
             }
         }
     }

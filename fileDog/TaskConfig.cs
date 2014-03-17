@@ -75,6 +75,27 @@ namespace me.sibo.fileDog
         public List<FileCategory> FileCategories { get; set; }
 
         /// <summary>
+        /// 获取当前任务的hostname
+        /// </summary>
+        /// <returns></returns>
+        public string GetTaskHost()
+        {
+            try
+            {
+                var host = new Uri(StartURL).Host;
+                if (!string.IsNullOrEmpty(host))
+                {
+                    return host;
+                }
+            }
+            catch
+            {
+
+            }
+            return "unknown";
+        }
+
+        /// <summary>
         /// 获取匹配地址
         /// </summary>
         /// <returns></returns>

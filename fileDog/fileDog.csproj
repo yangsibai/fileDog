@@ -69,7 +69,9 @@
     </ApplicationDefinition>
     <Compile Include="Model\FileCategory.cs" />
     <Compile Include="Model\FileType.cs" />
-    <Compile Include="Model\Feedback.cs" />
+    <Compile Include="Model\Result.cs" />
+    <Compile Include="Model\MessageType.cs" />
+    <Compile Include="Model\TaskInfo.cs" />
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Service\Redis.cs" />
     <Compile Include="Service\RedisConnectionGateway.cs" />
@@ -107,9 +109,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="Source\config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Source\fileCategories.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />

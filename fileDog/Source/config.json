@@ -10,27 +10,27 @@
 		"FileTypes": [{
 			"Name": ".bmp",
 			"Extension": ".bmp",
-			"Check": false,
+			"Check": true,
 			"Description": "Bitmap Image File"
 		}, {
 			"Name": ".gif",
 			"Extension": ".gif",
-			"Check": false,
+			"Check": true,
 			"Description": "Graphical Interchange Format File"
 		}, {
 			"Name": ".jpg",
 			"Extension": ".jpg",
-			"Check": false,
+			"Check": true,
 			"Description": "JPEG Image"
 		}, {
 			"Name": ".png",
 			"Extension": ".png",
-			"Check": false,
+			"Check": true,
 			"Description": "Portable Network Graphic"
 		}, {
 			"Name": ".psd",
 			"Extension": ".psd",
-			"Check": false,
+			"Check": true,
 			"Description": "Adobe Photoshop Document"
 		}]
 	}, {

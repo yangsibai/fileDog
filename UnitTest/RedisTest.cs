@@ -10,9 +10,6 @@ namespace UnitTest
         [TestMethod]
         public void PushUrlTest()
         {
-            Redis.PushUrl("http://www.baidu.com");
-            var result = Redis.PopUrl();
-            Assert.IsTrue(!string.IsNullOrEmpty(result));
         }
     }
 }
