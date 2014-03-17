@@ -26,6 +26,10 @@ namespace me.sibo.fileDog.Service
         /// <param name="urls"></param>
         public static void PushUrl(string[] urls)
         {
+            if (urls == null || !urls.Any())
+            {
+                return;
+            }
             using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
             {
                 conn.Open().Wait();
@@ -65,6 +69,10 @@ namespace me.sibo.fileDog.Service
         /// <param name="fileUrls"></param>
         public static void PushFileUrl(string[] fileUrls)
         {
+            if (fileUrls == null || !fileUrls.Any())
+            {
+                return;
+            }
             using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
             {
                 conn.Open().Wait();
@@ -95,6 +103,18 @@ namespace me.sibo.fileDog.Service
                     return Encoding.Default.GetString(task.Result);
                 }
                 return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// 清除所有数据
+        /// </summary>
+        public static void FlushDb()
+        {
+            using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+            {
+                conn.Open().Wait();
+                conn.Server.FlushAll();
             }
         }
 
