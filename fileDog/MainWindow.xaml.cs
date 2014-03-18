@@ -19,13 +19,11 @@ namespace me.sibo.fileDog
     public partial class MainWindow : MetroWindow
     {
         private readonly Paragraph _paragraph;
-        private readonly Process _redisProc;
-        private readonly DispatcherTimer t1;
-        private readonly DispatcherTimer t2;
-        private readonly DispatcherTimer t3;
 
-        private bool isDownloading;
-        private bool isResolving;
+        private readonly DispatcherTimer _taskStatusTimer;
+        private readonly DispatcherTimer _taskTimer;
+        private Process _redisProc;
+        private TaskInfo _taskInfo;
 
         public MainWindow()
         {
@@ -35,88 +33,61 @@ namespace me.sibo.fileDog
             _paragraph = new Paragraph();
             rtb.Document = new FlowDocument(_paragraph);
 
-            t1 = new DispatcherTimer();
-            t1.Tick += BeginResolveURL;
-            t1.Interval = TimeSpan.FromSeconds(1);
+            _taskTimer = new DispatcherTimer();
+            _taskTimer.Tick += BeginTask;
+            _taskTimer.Interval = TimeSpan.FromSeconds(1);
 
-            t2 = new DispatcherTimer();
-            t2.Tick += BeginDownloadFile;
-            t2.Interval = TimeSpan.FromSeconds(1);
-
-            t3 = new DispatcherTimer();
-            t3.Tick += GetTaskInfo;
-            t3.Interval = TimeSpan.FromSeconds(3);
-
-            string redisPath = Path.Combine(Directory.GetCurrentDirectory(), "Source", "Redis_64", "redis-server.exe");
-            var startInfo = new ProcessStartInfo
-            {
-                CreateNoWindow = true,
-                UseShellExecute = false,
-                FileName = redisPath,
-                WindowStyle = ProcessWindowStyle.Hidden,
-            };
-            _redisProc = Process.Start(startInfo);
+            _taskStatusTimer = new DispatcherTimer();
+            _taskStatusTimer.Tick += DisplayTaskStatus;
+            _taskStatusTimer.Interval = TimeSpan.FromSeconds(1);
         }
 
         /// <summary>
-        ///     解析网页
+        ///     开始任务
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void BeginResolveURL(object sender, EventArgs e)
+        private void BeginTask(object sender, EventArgs e)
         {
-            if (!isResolving)
+            if (_taskInfo != null && NetScheduler.Borrow())
             {
-                isResolving = true;
-                Task.Factory.StartNew(() => WebResolver.ResolveUrl())
-                    .ContinueWith(cont =>
-                    {
-                        isResolving = false;
-                        ShowMessage(cont.Result);
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
-            }
-            else
-            {
-                ShowMessage(MessageType.Infomation, "a url is resolving");
-            }
-        }
-
-        /// <summary>
-        ///     开始下载文件
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void BeginDownloadFile(object sender, EventArgs e)
-        {
-            if (!isDownloading)
-            {
-                isDownloading = true;
-                Task.Factory.StartNew(() => WebResolver.DownloadFile()).ContinueWith(cont =>
+                if (_taskInfo.UrlCount <= _taskInfo.FileUrlCount)
                 {
-                    isDownloading = false;
-                    ShowMessage(cont.Result);
-                }, TaskScheduler.FromCurrentSynchronizationContext());
-            }
-            else
-            {
-                ShowMessage(MessageType.Infomation, "a file is downloading");
+                    Task.Factory.StartNew(() => WebResolver.ResolveUrl()).ContinueWith(task =>
+                    {
+                        NetScheduler.Return();
+                        task.Result.Start();
+                        task.Result.ContinueWith(continu => ShowMessage(continu.Result));
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                }
+                else
+                {
+                    Task.Factory.StartNew(() => WebResolver.DownloadFile())
+                        .ContinueWith(continu =>
+                        {
+                            NetScheduler.Return();
+                            ShowMessage(continu.Result);
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                }
             }
         }
 
         /// <summary>
-        ///     获取task信息
+        ///     显示任务状态信息
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void GetTaskInfo(object sender, EventArgs e)
+        private void DisplayTaskStatus(object sender, EventArgs e)
         {
             Task.Factory.StartNew(() => Redis.GeTaskInfo()).ContinueWith(cont =>
             {
-                TaskInfo taskInfo = cont.Result;
+                _taskInfo = cont.Result;
                 TaskStatusTransition.Content =
-                    string.Format("url:{0}    checkedUrl:{1}    fileUrl:{2}    fileChecked:{3}    fileDownloaded:{4}",
-                        taskInfo.UrlCount, taskInfo.UrlCheckedCount, taskInfo.FileUrlCount, taskInfo.FileCheckedCount,
-                        taskInfo.DownloadFileCount);
+                    string.Format(
+                        "url:{0}    checkedUrl:{1}    fileUrl:{2}    fileChecked:{3}    fileDownloaded:{4}    net:{5}",
+                        _taskInfo.UrlCount, _taskInfo.UrlCheckedCount, _taskInfo.FileUrlCount,
+                        _taskInfo.FileCheckedCount,
+                        _taskInfo.DownloadFileCount, NetScheduler.NetCount);
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -128,14 +99,29 @@ namespace me.sibo.fileDog
         private void StartButton_OnClick(object sender, RoutedEventArgs e)
         {
             ShowMessage(MessageType.Infomation, "start at:", TaskConfig.GetInstance().StartURL);
-            Task.Factory.StartNew(() => WebResolver.ResolveUrl(TaskConfig.GetInstance().StartURL))
-                .ContinueWith(continuation =>
+
+            Task.Factory.StartNew(() =>
+            {
+                string redisPath = Path.Combine(Directory.GetCurrentDirectory(), "Source", "Redis_64",
+                    "redis-server.exe");
+                var startInfo = new ProcessStartInfo
                 {
-                    ShowMessage(continuation.Result);
-                    t1.Start();
-                    t2.Start();
-                    t3.Start();
-                }, TaskScheduler.FromCurrentSynchronizationContext());
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    FileName = redisPath,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                };
+                _redisProc = Process.Start(startInfo);
+            }).ContinueWith(task => WebResolver.ResolveUrl(TaskConfig.GetInstance().StartURL)).ContinueWith(task =>
+            {
+                task.Result.Start();
+                task.Result.ContinueWith(cont =>
+                {
+                    ShowMessage(cont.Result);
+                    _taskTimer.Start();
+                    _taskStatusTimer.Start();
+                });
+            }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
         /// <summary>
@@ -145,19 +131,18 @@ namespace me.sibo.fileDog
         /// <param name="e"></param>
         private void StopButton_OnClick(object sender, RoutedEventArgs e)
         {
-            t1.Stop();
-            t2.Stop();
-            t3.Stop();
+            _taskTimer.Stop();
+            _taskStatusTimer.Stop();
             ShowMessage(MessageType.Infomation, "停止任务");
         }
 
         /// <summary>
         ///     显示结果信息
         /// </summary>
-        /// <param name="result"></param>
-        private void ShowMessage(Result result)
+        /// <param name="myResult"></param>
+        private void ShowMessage(MyResult myResult)
         {
-            ShowMessage(result.Success ? MessageType.Success : MessageType.Warn, result.Message);
+            ShowMessage(myResult.Success ? MessageType.Success : MessageType.Warn, myResult.Message);
         }
 
         /// <summary>

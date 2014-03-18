@@ -8,15 +8,15 @@ namespace me.sibo.fileDog.Model
     /// <summary>
     /// 反馈
     /// </summary>
-    public class Result
+    public class MyResult
     {
-        public Result(string errorMessage)
+        public MyResult(string errorMessage)
         {
             Success = false;
             Message = errorMessage;
         }
 
-        public Result(bool success, string message)
+        public MyResult(bool success, string message)
         {
             Success = success;
             Message = message;

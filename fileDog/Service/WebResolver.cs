@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using me.sibo.fileDog.Model;
+using me.sibo.fileDog.Utils;
 
 namespace me.sibo.fileDog.Service
 {
@@ -12,7 +14,7 @@ namespace me.sibo.fileDog.Service
         /// <summary>
         ///     解析对应的地址
         /// </summary>
-        public static Result ResolveUrl(string url = "")
+        public static Task<MyResult> ResolveUrl(string url = "")
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -20,61 +22,65 @@ namespace me.sibo.fileDog.Service
             }
             try
             {
-                if (string.IsNullOrEmpty(url)) return new Result("url is empty");
-                var client = new WebClient();
+                if (string.IsNullOrEmpty(url)) return new Task<MyResult>(() => new MyResult("no url"));
+
+                var client = new MyWebClient();
+
                 string pageContent = client.DownloadString(new Uri(url));
-
-                TaskConfig config = TaskConfig.GetInstance();
-                var imgSrcRegex = new Regex("src=('|\")([^\"']*)('|\")", RegexOptions.IgnoreCase);
-                MatchCollection matches = imgSrcRegex.Matches(pageContent);
-
-                var fileList = new List<string>();
-                var baseUri = new Uri(url);
-                Uri newUri;
-                foreach (Match match in matches)
+                return new Task<MyResult>(() =>
                 {
-                    newUri = new Uri(baseUri, match.Groups[2].Value);
-                    if (config.FilePattern().IsMatch(newUri.AbsoluteUri))
-                    {
-                        fileList.Add(newUri.AbsoluteUri);
-                    }
-                }
+                    TaskConfig config = TaskConfig.GetInstance();
+                    var imgSrcRegex = new Regex("src=('|\")([^\"']*)('|\")", RegexOptions.IgnoreCase);
+                    MatchCollection matches = imgSrcRegex.Matches(pageContent);
 
-                var hrefRegex = new Regex("href=('|\")([^\"']*)('|\")", RegexOptions.IgnoreCase);
-                MatchCollection hrefMatches = hrefRegex.Matches(pageContent);
-                var urlList = new List<string>();
-                foreach (Match match in hrefMatches)
-                {
-                    newUri = new Uri(baseUri, match.Groups[2].Value);
-                    if (config.FilePattern().IsMatch(newUri.AbsoluteUri))
+                    var fileList = new List<string>();
+                    var baseUri = new Uri(url);
+                    Uri newUri;
+                    foreach (Match match in matches)
                     {
-                        fileList.Add(newUri.AbsoluteUri);
+                        newUri = new Uri(baseUri, match.Groups[2].Value);
+                        if (config.FilePattern().IsMatch(newUri.AbsoluteUri))
+                        {
+                            fileList.Add(newUri.AbsoluteUri);
+                        }
                     }
-                    else if (config.URLPattern().IsMatch(newUri.AbsoluteUri))
+
+                    var hrefRegex = new Regex("href=('|\")([^\"']*)('|\")", RegexOptions.IgnoreCase);
+                    MatchCollection hrefMatches = hrefRegex.Matches(pageContent);
+                    var urlList = new List<string>();
+                    foreach (Match match in hrefMatches)
                     {
-                        urlList.Add(newUri.AbsoluteUri);
+                        newUri = new Uri(baseUri, match.Groups[2].Value);
+                        if (config.FilePattern().IsMatch(newUri.AbsoluteUri))
+                        {
+                            fileList.Add(newUri.AbsoluteUri);
+                        }
+                        else if (config.URLPattern().IsMatch(newUri.AbsoluteUri))
+                        {
+                            urlList.Add(newUri.AbsoluteUri);
+                        }
                     }
-                }
-                Redis.PushFileUrl(fileList.ToArray());
-                Redis.PushUrl(urlList.ToArray());
-                return new Result(true,
-                    "success:" + url + " fileCount:" + fileList.Count + " urlCount:" + urlList.Count);
+                    Redis.PushFileUrl(fileList.ToArray());
+                    Redis.PushUrl(urlList.ToArray());
+                    return new MyResult(true,
+                        "success:" + url + " fileCount:" + fileList.Count + " urlCount:" + urlList.Count);
+                });
             }
             catch (Exception e)
             {
-                return new Result("resolve:" + url + " " + e.Message);
+                return new Task<MyResult>(() => new MyResult("resolve:" + url + " " + e.Message));
             }
         }
 
         /// <summary>
         ///     下载文件
         /// </summary>
-        public static Result DownloadFile()
+        public static MyResult DownloadFile()
         {
             string fileUrl = Redis.PopFileUrl();
             if (string.IsNullOrEmpty(fileUrl))
             {
-                return new Result("no file url");
+                return new MyResult("no file url");
             }
             try
             {
@@ -100,20 +106,20 @@ namespace me.sibo.fileDog.Service
                             string extension = Path.GetExtension(fileUrl).ToLower();
                             string fileName = Guid.NewGuid() + extension;
                             string filePath = Path.Combine(fileSaveDir, fileName);
-                            using (var client = new WebClient())
+                            using (var client = new MyWebClient())
                             {
                                 client.DownloadFile(new Uri(fileUrl), filePath);
                                 Redis.FileDownloaded(fileUrl);
-                                return new Result(true, "download " + fileUrl + " successfully");
+                                return new MyResult(true, "download " + fileUrl + " successfully");
                             }
                         }
                     }
-                    return new Result("not download:" + fileUrl);
+                    return new MyResult("not download:" + fileUrl);
                 }
             }
             catch (Exception e)
             {
-                return new Result("download: " + fileUrl + " error:" + e.Message);
+                return new MyResult("download: " + fileUrl + " error:" + e.Message);
             }
         }
     }

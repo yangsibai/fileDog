@@ -69,14 +69,18 @@
     </ApplicationDefinition>
     <Compile Include="Model\FileCategory.cs" />
     <Compile Include="Model\FileType.cs" />
-    <Compile Include="Model\Result.cs" />
+    <Compile Include="Model\MyResult.cs" />
     <Compile Include="Model\MessageType.cs" />
     <Compile Include="Model\TaskInfo.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Service\NetScheduler.cs" />
     <Compile Include="Service\Redis.cs" />
     <Compile Include="Service\RedisConnectionGateway.cs" />
     <Compile Include="Service\WebResolver.cs" />
     <Compile Include="TaskConfig.cs" />
+    <Compile Include="Utils\MyWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
