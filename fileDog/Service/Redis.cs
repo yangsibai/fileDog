@@ -52,7 +52,7 @@ namespace me.sibo.fileDog.Service
             using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
             {
                 conn.Open().Wait();
-                Task<byte[]> task = conn.Sets.GetRandom(db, UrlsCacheKey);
+                Task<byte[]> task = conn.Sets.RemoveRandom(db, UrlsCacheKey);
                 task.Wait();
                 if (task.Result != null && task.Result.Any())
                 {
@@ -95,7 +95,7 @@ namespace me.sibo.fileDog.Service
             using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
             {
                 conn.Open().Wait();
-                Task<byte[]> task = conn.Sets.GetRandom(db, FilesUrlCachekey);
+                Task<byte[]> task = conn.Sets.RemoveRandom(db, FilesUrlCachekey);
                 task.Wait();
                 if (task.Result != null && task.Result.Any())
                 {
