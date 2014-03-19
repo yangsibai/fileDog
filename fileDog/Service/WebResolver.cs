@@ -87,6 +87,7 @@ namespace me.sibo.fileDog.Service
                 TaskConfig config = TaskConfig.GetInstance();
 
                 WebRequest webRequest = WebRequest.Create(fileUrl);
+                webRequest.Proxy=new WebProxy("127.0.0.1",8087);
                 webRequest.Method = "HEAD";
                 using (WebResponse response = webRequest.GetResponse())
                 {

@@ -51,16 +51,12 @@ namespace me.sibo.fileDog
         {
             if (_taskInfo != null && NetScheduler.Borrow())
             {
-                if (_taskInfo.UrlCount <= _taskInfo.FileUrlCount)
+                if (_taskInfo.UrlCount == 0 && _taskInfo.FileUrlCount == 0)
                 {
-                    Task.Factory.StartNew(() => WebResolver.ResolveUrl()).ContinueWith(task =>
-                    {
-                        NetScheduler.Return();
-                        task.Result.Start();
-                        task.Result.ContinueWith(continu => ShowMessage(continu.Result));
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                    ShowMessage(MessageType.Warn, "没有文章信息也没有文件地址，任务停止");
+                    StopTask();
                 }
-                else
+                if (_taskInfo.FileUrlCount>0)
                 {
                     Task.Factory.StartNew(() => WebResolver.DownloadFile())
                         .ContinueWith(continu =>
@@ -68,6 +64,15 @@ namespace me.sibo.fileDog
                             NetScheduler.Return();
                             ShowMessage(continu.Result);
                         }, TaskScheduler.FromCurrentSynchronizationContext());
+                }
+                else
+                {
+                    Task.Factory.StartNew(() => WebResolver.ResolveUrl()).ContinueWith(task =>
+                    {
+                        NetScheduler.Return();
+                        task.Result.Start();
+                        task.Result.ContinueWith(continu => ShowMessage(continu.Result));
+                    }, TaskScheduler.FromCurrentSynchronizationContext());
                 }
             }
         }
@@ -130,6 +135,11 @@ namespace me.sibo.fileDog
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void StopButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            StopTask();
+        }
+
+        private void StopTask()
         {
             _taskTimer.Stop();
             _taskStatusTimer.Stop();
