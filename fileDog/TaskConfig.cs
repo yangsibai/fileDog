@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using fileDog.Annotations;
 using me.sibo.fileDog.Model;
 using Newtonsoft.Json;
 
@@ -12,7 +14,7 @@ namespace me.sibo.fileDog
     /// <summary>
     ///     任务设置
     /// </summary>
-    public sealed class TaskConfig
+    public sealed class TaskConfig : INotifyPropertyChanged
     {
         private static readonly object Lock = new object();
         private static TaskConfig _instance;
@@ -114,11 +116,20 @@ namespace me.sibo.fileDog
             foreach (FileCategory fileCategory in _instance.FileCategories)
             {
                 checkedFiles.AddRange(from fileType in fileCategory.FileTypes
-                    where fileType.Check
+                    where fileType.IsCheck
                     select fileType.Extension);
             }
             var str="("+ String.Join("|", checkedFiles).Replace(".", "\\.")+")$";
             return new Regex(str,RegexOptions.IgnoreCase);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

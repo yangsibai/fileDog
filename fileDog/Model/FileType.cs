@@ -5,6 +5,8 @@
     /// </summary>
     public class FileType
     {
+        private FileCategory _parent;
+
         /// <summary>
         /// 文件介绍
         /// </summary>
@@ -20,9 +22,19 @@
         /// </summary>
         public string Description { get; set; }
 
-        /// <summary>
-        /// 是否选中
-        /// </summary>
-        public bool Check { get; set; }
+
+        private bool _isCheck = false;
+
+        public bool IsCheck
+        {
+            get
+            {
+                return _isCheck;
+            }
+            set
+            {
+                _isCheck = value;
+            }
+        }
     }
 }

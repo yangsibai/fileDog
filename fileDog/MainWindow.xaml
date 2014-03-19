@@ -41,7 +41,7 @@
                                     </HierarchicalDataTemplate>
                                     <DataTemplate DataType="{x:Type local:FileType}">
                                         <StackPanel Orientation="Horizontal">
-                                            <CheckBox Name="chk" Margin="2" IsChecked="{Binding Path=Check}" />
+                                            <CheckBox Name="chk" Margin="2" IsChecked="{Binding Path=IsCheck}" />
                                             <TextBlock Text="{Binding Path=Name}" ToolTip="{Binding Path=Description}" />
                                         </StackPanel>
                                     </DataTemplate>
