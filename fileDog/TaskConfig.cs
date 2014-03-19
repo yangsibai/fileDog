@@ -19,13 +19,9 @@ namespace me.sibo.fileDog
         private static readonly object Lock = new object();
         private static TaskConfig _instance;
 
-        private TaskConfig()
-        {
-            
-        }
-
         public static TaskConfig GetInstance()
         {
+           
             if (_instance == null)
             {
                 lock (Lock)
@@ -35,6 +31,14 @@ namespace me.sibo.fileDog
                         var configFilePath = Path.Combine(Directory.GetCurrentDirectory(), "Source", "config.json");
                         string configJson = File.ReadAllText(configFilePath);
                         _instance = JsonConvert.DeserializeObject<TaskConfig>(configJson);
+                        foreach (var category in _instance.FileCategories)
+                        {
+                            category.UpdateState();
+                            foreach (var fileType in category.FileTypes)
+                            {
+                                fileType.Parent=category;
+                            }
+                        }
                     }
                 }
             }
@@ -116,7 +120,7 @@ namespace me.sibo.fileDog
             foreach (FileCategory fileCategory in _instance.FileCategories)
             {
                 checkedFiles.AddRange(from fileType in fileCategory.FileTypes
-                    where fileType.IsCheck
+                    where fileType.IsChecked.HasValue && fileType.IsChecked.Value
                     select fileType.Extension);
             }
             var str="("+ String.Join("|", checkedFiles).Replace(".", "\\.")+")$";

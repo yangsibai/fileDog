@@ -10,27 +10,27 @@
 		"FileTypes": [{
 			"Name": ".bmp",
 			"Extension": ".bmp",
-			"Check": false,
+			"IsChecked": true,
 			"Description": "Bitmap Image File"
 		}, {
 			"Name": ".gif",
 			"Extension": ".gif",
-			"Check": false,
+			"IsChecked": true,
 			"Description": "Graphical Interchange Format File"
 		}, {
 			"Name": ".jpg",
 			"Extension": ".jpg",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "JPEG Image"
 		}, {
 			"Name": ".png",
 			"Extension": ".png",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Portable Network Graphic"
 		}, {
 			"Name": ".psd",
 			"Extension": ".psd",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Adobe Photoshop Document"
 		}]
 	}, {
@@ -38,17 +38,17 @@
 		"FileTypes": [{
 			"Name": ".doc",
 			"Extension": ".doc",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Microsoft Word Document"
 		}, {
 			"Name": ".docx",
 			"Extension": ".docx",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Microsoft Word Open XML Document"
 		}, {
 			"Name": ".txt",
 			"Extension": ".txt",
-			"Check": true,
+			"IsChecked": true,
 			"Description": "Plain Text File"
 		}]
 	}, {
@@ -56,22 +56,22 @@
 		"FileTypes": [{
 			"Name": ".mid",
 			"Extension": ".mid",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "MIDI File"
 		}, {
 			"Name": ".mp3",
 			"Extension": ".mp3",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "MP3 Audio File"
 		}, {
 			"Name": ".wav",
 			"Extension": ".wav",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "WAVE Audio File"
 		}, {
 			"Name": ".wma",
 			"Extension": ".wma",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Windows Media Audio File"
 		}]
 	}, {
@@ -79,17 +79,17 @@
 		"FileTypes": [{
 			"Name": ".azw",
 			"Extension": ".azw",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Amazon Kindle eBook File"
 		}, {
 			"Name": ".epub",
 			"Extension": ".epub",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Open eBook File"
 		}, {
 			"Name": ".mobi",
 			"Extension": ".mobi",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Mobipocket eBook"
 		}]
 	}, {
@@ -97,22 +97,22 @@
 		"FileTypes": [{
 			"Name": ".ai",
 			"Extension": ".ai",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Adobe Illustrator File"
 		}, {
 			"Name": ".eps",
 			"Extension": ".eps",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Encapsulated PostScript File"
 		}, {
 			"Name": ".ps",
 			"Extension": ".ps",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "PostScript File"
 		}, {
 			"Name": ".svg",
 			"Extension": ".svg",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Scalable Vector Graphics File"
 		}]
 	}, {
@@ -120,17 +120,17 @@
 		"FileTypes": [{
 			"Name": ".7z",
 			"Extension": ".7z",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "7-Zip Compressed File"
 		}, {
 			"Name": ".rar",
 			"Extension": ".rar",
-			"Check": true,
+			"IsChecked": true,
 			"Description": "WinRAR Compressed Archive"
 		}, {
 			"Name": ".zip",
 			"Extension": ".zip",
-			"Check": true,
+			"IsChecked": true,
 			"Description": "Zipped File"
 		}]
 	}, {
@@ -138,17 +138,17 @@
 		"FileTypes": [{
 			"Name": ".apk",
 			"Extension": ".apk",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Android Package File"
 		}, {
 			"Name": ".bat",
 			"Extension": ".bat",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "DOS Batch File"
 		}, {
 			"Name": ".exe",
 			"Extension": ".exe",
-			"Check": false,
+			"IsChecked": false,
 			"Description": "Windows Executable File"
 		}]
 	}]
