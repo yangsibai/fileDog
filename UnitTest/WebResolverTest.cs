@@ -16,7 +16,7 @@ namespace UnitTest
         [TestMethod]
         public void DownloadTest2()
         {
-            WebResolver.DownloadFile(); ;
+            WebResolver.DownloadFile("http://file.mockup-b.com/software/MockupBSetup.air"); ;
         }
     }
 }
