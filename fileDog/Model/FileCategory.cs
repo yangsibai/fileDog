@@ -24,7 +24,7 @@ namespace me.sibo.fileDog.Model
                 if (value == _isChecked) return;
 
                 _isChecked = value;
-                if (_isChecked.HasValue)
+                if (_isChecked.HasValue&&FileTypes!=null)
                 {
                     FileTypes.ForEach(f => f.SetCheckedByParent(_isChecked.Value));
                 }
@@ -45,18 +45,21 @@ namespace me.sibo.fileDog.Model
         public void UpdateState()
         {
             bool? state = null;
-            for (var i = 0; i < FileTypes.Count; i++)
+            if (FileTypes != null)
             {
-                var current = FileTypes[i].IsChecked;
-                if (i == 0)
+                for (var i = 0; i < FileTypes.Count; i++)
                 {
-                    state = current;
-                }
-                else if (state != current)
-                {
-                    state = null;
-                    break;
-                }
+                    var current = FileTypes[i].IsChecked;
+                    if (i == 0)
+                    {
+                        state = current;
+                    }
+                    else if (state != current)
+                    {
+                        state = null;
+                        break;
+                    }
+                } 
             }
             _isChecked = state;
             this.OnPropertyChanged("IsChecked");
