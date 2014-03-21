@@ -11,6 +11,7 @@ using System.Windows.Threading;
 using MahApps.Metro.Controls;
 using me.sibo.fileDog.Model;
 using me.sibo.fileDog.Service;
+using Newtonsoft.Json;
 
 namespace me.sibo.fileDog
 {
@@ -206,6 +207,8 @@ namespace me.sibo.fileDog
         {
             try
             {
+                string json = JsonConvert.SerializeObject(TaskConfig.GetInstance());
+                File.WriteAllText(Path.Combine(Directory.GetCurrentDirectory(), "Source", "config.json"), json);
                 _redisProc.Kill(); //退出redis
             }
             catch (Exception exception)
@@ -224,6 +227,16 @@ namespace me.sibo.fileDog
             Task.Factory.StartNew(Redis.FlushDb)
                 .ContinueWith(cont => ShowMessage(MessageType.Infomation, "Clear All Data"),
                     TaskScheduler.FromCurrentSynchronizationContext());
+        }
+
+        /// <summary>
+        /// 设置代理
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Flyout.IsOpen = !Flyout.IsOpen;
         }
     }
 }
