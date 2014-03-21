@@ -4,6 +4,7 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Media;
 using me.sibo.fileDog.Model;
 using me.sibo.fileDog.Utils;
 
@@ -75,19 +76,29 @@ namespace me.sibo.fileDog.Service
         /// <summary>
         ///     下载文件
         /// </summary>
-        public static MyResult DownloadFile()
+        public static MyResult DownloadFile(string fileUrl = "")
         {
-            string fileUrl = Redis.PopFileUrl();
             if (string.IsNullOrEmpty(fileUrl))
             {
-                return new MyResult("no file url");
+                fileUrl = Redis.PopFileUrl();
+                if (string.IsNullOrEmpty(fileUrl))
+                {
+                    return new MyResult("no file url");                    
+                }
             }
             try
             {
                 TaskConfig config = TaskConfig.GetInstance();
 
                 WebRequest webRequest = WebRequest.Create(fileUrl);
-                webRequest.Proxy=new WebProxy("127.0.0.1",8087);
+                if (config.EnableProxy)
+                {
+                    webRequest.Proxy = new WebProxy(config.ProxyHost, config.ProxyPort);
+                }
+                else
+                {
+                    webRequest.Proxy = null;
+                }
                 webRequest.Method = "HEAD";
                 using (WebResponse response = webRequest.GetResponse())
                 {
@@ -105,7 +116,16 @@ namespace me.sibo.fileDog.Service
                                 Directory.CreateDirectory(fileSaveDir);
                             }
                             string extension = Path.GetExtension(fileUrl).ToLower();
-                            string fileName = Guid.NewGuid() + extension;
+
+                            string fileName;
+                            if (TaskConfig.GetInstance().RenameFile)
+                            {
+                                fileName = Guid.NewGuid() + extension;
+                            }
+                            else
+                            {
+                                fileName = Path.GetFileName(fileUrl);
+                            }
                             string filePath = Path.Combine(fileSaveDir, fileName);
                             using (var client = new MyWebClient())
                             {
