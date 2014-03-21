@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Media;
 using me.sibo.fileDog.Model;
 using me.sibo.fileDog.Utils;
 
@@ -15,11 +14,11 @@ namespace me.sibo.fileDog.Service
         /// <summary>
         ///     解析对应的地址
         /// </summary>
-        public static Task<MyResult> ResolveUrl(string url = "")
+        public static Task<MyResult> ResolveUrl(string url)
         {
             if (string.IsNullOrEmpty(url))
             {
-                url = Redis.PopUrl();
+                return new Task<MyResult>(() => new MyResult("url is null or empty"));
             }
             try
             {
@@ -76,15 +75,11 @@ namespace me.sibo.fileDog.Service
         /// <summary>
         ///     下载文件
         /// </summary>
-        public static MyResult DownloadFile(string fileUrl = "")
+        public static MyResult DownloadFile(string fileUrl)
         {
             if (string.IsNullOrEmpty(fileUrl))
             {
-                fileUrl = Redis.PopFileUrl();
-                if (string.IsNullOrEmpty(fileUrl))
-                {
-                    return new MyResult("no file url");                    
-                }
+                return new MyResult("no file url"); 
             }
             try
             {

@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using MahApps.Metro.Controls;
@@ -38,7 +37,7 @@ namespace me.sibo.fileDog
 
             _taskTimer = new DispatcherTimer();
             _taskTimer.Tick += BeginTask;
-            _taskTimer.Interval = TimeSpan.FromSeconds(1);
+            _taskTimer.Interval = TimeSpan.FromSeconds(2);
 
             _taskStatusTimer = new DispatcherTimer();
             _taskStatusTimer.Tick += DisplayTaskStatus;
@@ -52,16 +51,12 @@ namespace me.sibo.fileDog
         /// <param name="e"></param>
         private void BeginTask(object sender, EventArgs e)
         {
-            if (_taskInfo != null && NetScheduler.Borrow())
+            while (_taskInfo != null && NetScheduler.Borrow())
             {
-                if (_taskInfo.UrlCount == 0 && _taskInfo.FileUrlCount == 0)
+                string url = Redis.PopFileUrl();
+                if (!string.IsNullOrEmpty(url))
                 {
-                    ShowMessage(MessageType.Warn, "没有文章信息也没有文件地址，任务停止");
-                    StopTask();
-                }
-                if (_taskInfo.FileUrlCount>0)
-                {
-                    Task.Factory.StartNew(() => WebResolver.DownloadFile())
+                    Task.Factory.StartNew(() => WebResolver.DownloadFile(url))
                         .ContinueWith(continu =>
                         {
                             NetScheduler.Return();
@@ -70,12 +65,22 @@ namespace me.sibo.fileDog
                 }
                 else
                 {
-                    Task.Factory.StartNew(() => WebResolver.ResolveUrl()).ContinueWith(task =>
+                    url = Redis.PopUrl();
+                    if (!string.IsNullOrEmpty(url))
                     {
-                        NetScheduler.Return();
-                        task.Result.Start();
-                        task.Result.ContinueWith(continu => ShowMessage(continu.Result));
-                    }, TaskScheduler.FromCurrentSynchronizationContext());
+                        Task.Factory.StartNew(() => WebResolver.ResolveUrl(url)).ContinueWith(task =>
+                        {
+                            NetScheduler.Return();
+                            task.Result.Start();
+                            task.Result.ContinueWith(continu => ShowMessage(continu.Result));
+                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                    }
+                    else
+                    {
+                        ShowMessage(MessageType.Warn, "没有文章信息也没有文件地址，任务停止");
+                        StopTask();
+                        break;
+                    }
                 }
             }
         }
@@ -222,7 +227,7 @@ namespace me.sibo.fileDog
         }
 
         /// <summary>
-        /// 设置代理
+        ///     设置代理
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
