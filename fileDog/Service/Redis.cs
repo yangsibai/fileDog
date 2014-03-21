@@ -114,7 +114,7 @@ namespace me.sibo.fileDog.Service
             using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
             {
                 conn.Open().Wait();
-                conn.Server.FlushAll();
+                conn.Server.FlushDb(db).Wait();
             }
         }
 
@@ -132,7 +132,11 @@ namespace me.sibo.fileDog.Service
             }
         }
 
-        public static TaskInfo GeTaskInfo()
+        /// <summary>
+        /// 获取任务状态
+        /// </summary>
+        /// <returns></returns>
+        public static TaskInfo GetTaskStatus()
         {
             using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
             {

@@ -87,7 +87,7 @@ namespace me.sibo.fileDog
         /// <param name="e"></param>
         private void DisplayTaskStatus(object sender, EventArgs e)
         {
-            Task.Factory.StartNew(() => Redis.GeTaskInfo()).ContinueWith(cont =>
+            Task.Factory.StartNew(() => Redis.GetTaskStatus()).ContinueWith(cont =>
             {
                 _taskInfo = cont.Result;
                 TaskStatusTransition.Content =

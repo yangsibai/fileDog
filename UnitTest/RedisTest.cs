@@ -8,8 +8,9 @@ namespace UnitTest
     public class RedisTest
     {
         [TestMethod]
-        public void PushUrlTest()
+        public void FlushDbTest()
         {
+            Redis.FlushDb();
         }
     }
 }
