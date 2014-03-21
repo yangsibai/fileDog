@@ -42,7 +42,7 @@ namespace me.sibo.fileDog
 
             _taskStatusTimer = new DispatcherTimer();
             _taskStatusTimer.Tick += DisplayTaskStatus;
-            _taskStatusTimer.Interval = TimeSpan.FromSeconds(1);
+            _taskStatusTimer.Interval = TimeSpan.FromSeconds(3);
         }
 
         /// <summary>
@@ -187,14 +187,6 @@ namespace me.sibo.fileDog
                 Foreground = bru
             });
             _paragraph.Inlines.Add(new LineBreak());
-
-
-//            var tr = new TextRange(rtb.Document.ContentEnd, rtb.Document.ContentEnd)
-//            {
-//                Text =DateTime.Now.ToString("MM-dd HH:mm:ss => ") + String.Join("\t", messages)
-//            };
-//            tr.ApplyPropertyValue(TextElement.ForegroundProperty, bru);
-//            rtb.AppendText("\n");
             MessageScrollViewer.ScrollToEnd();
         }
 
