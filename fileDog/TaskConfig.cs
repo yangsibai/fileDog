@@ -45,10 +45,28 @@ namespace me.sibo.fileDog
             return _instance;
         }
 
-        /// <summary>
-        ///     开始地址
-        /// </summary>
-        public String StartURL { get; set; }
+        private string _startURL;
+
+        public string StartURL
+        {
+            get
+            {
+                return _startURL;
+            }
+            set
+            {
+                _startURL = value;
+                try
+                {
+                    MatchURL = new Uri(_startURL).Host.Replace("www.","");
+                }
+                catch (Exception e)
+                {
+                    MatchURL = "Start URL is invalid";
+                }
+                this.OnPropertyChanged("MatchURL");
+            }
+        }
 
         /// <summary>
         /// 匹配地址
@@ -74,6 +92,16 @@ namespace me.sibo.fileDog
         ///     启用代理
         /// </summary>
         public bool EnableProxy { get; set; }
+
+        /// <summary>
+        /// 代理地址
+        /// </summary>
+        public string ProxyHost { get; set; }
+
+        /// <summary>
+        /// 代理端口
+        /// </summary>
+        public int ProxyPort { get; set; }
 
         /// <summary>
         ///     文件列表
