@@ -5,6 +5,8 @@
 	"FileMaxSize": 10240,
 	"RenameFile": false,
 	"EnableProxy": false,
+	"ProxyHost":"127.0.0.1",
+	"ProxyPort":8087,
 	"FileCategories": [{
 		"Name": "image",
 		"FileTypes": [{
