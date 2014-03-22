@@ -2,7 +2,7 @@
 {
     public static class NetScheduler
     {
-        private static int _netLimit = 5;
+        private static int _netLimit = 10;
 
         private static readonly object Lock = new object();
 

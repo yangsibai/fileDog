@@ -42,6 +42,13 @@ namespace me.sibo.fileDog
             _taskStatusTimer = new DispatcherTimer();
             _taskStatusTimer.Tick += DisplayTaskStatus;
             _taskStatusTimer.Interval = TimeSpan.FromSeconds(3);
+
+            Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
+        }
+
+        void Current_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            ShowMessage(MessageType.Warn,e.Exception.Message);
         }
 
         /// <summary>
