@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using BookSleeve;
@@ -12,7 +13,7 @@ namespace me.sibo.fileDog.Service
     /// </summary>
     public static class Redis
     {
-        private const int db = 0;
+        private const int DefaultDb = 0;
 
         private static readonly string UrlsCacheKey = TaskConfig.GetInstance().GetTaskHost() + "_urls";
         private static readonly string UrlChecked = TaskConfig.GetInstance().GetTaskHost() + "_urlChecked";
@@ -26,20 +27,27 @@ namespace me.sibo.fileDog.Service
         /// <param name="urls"></param>
         public static void PushUrl(string[] urls)
         {
-            if (urls == null || !urls.Any())
+            try
             {
-                return;
+                if (urls == null || !urls.Any())
+                {
+                    return;
+                }
+                using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+                {
+                    conn.Open().Wait();
+                    string guid = Guid.NewGuid().ToString();
+                    conn.Sets.Add(DefaultDb, guid, urls).Wait();
+                    string[] keys = {guid, UrlChecked};
+                    Task<byte[][]> task = conn.Sets.Difference(DefaultDb, keys);
+                    task.Wait();
+                    conn.Sets.Add(DefaultDb, UrlsCacheKey, task.Result).Wait();
+                    conn.Keys.Remove(DefaultDb, guid); //remove guid cache
+                }
             }
-            using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+            catch (Exception e)
             {
-                conn.Open().Wait();
-                string guid = Guid.NewGuid().ToString();
-                conn.Sets.Add(db, guid, urls).Wait();
-                string[] keys = {guid, UrlChecked};
-                Task<byte[][]> task = conn.Sets.Difference(db, keys);
-                task.Wait();
-                conn.Sets.Add(db, UrlsCacheKey, task.Result).Wait();
-                conn.Keys.Remove(db, guid); //remove guid cache
+                Logger.Error(MethodBase.GetCurrentMethod(),e);
             }
         }
 
@@ -49,17 +57,25 @@ namespace me.sibo.fileDog.Service
         /// <returns></returns>
         public static string PopUrl()
         {
-            using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+            try
             {
-                conn.Open().Wait();
-                Task<byte[]> task = conn.Sets.RemoveRandom(db, UrlsCacheKey);
-                task.Wait();
-                if (task.Result != null && task.Result.Any())
+                using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
                 {
-                    conn.Sets.Add(db, UrlChecked, task.Result);
-                    return Encoding.Default.GetString(task.Result);
+                    conn.Open().Wait();
+                    Task<byte[]> task = conn.Sets.RemoveRandom(DefaultDb, UrlsCacheKey);
+                    task.Wait();
+                    if (task.Result != null && task.Result.Any())
+                    {
+                        conn.Sets.Add(DefaultDb, UrlChecked, task.Result);
+                        return Encoding.Default.GetString(task.Result);
+                    }
+                    return string.Empty;
                 }
-                return string.Empty;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(MethodBase.GetCurrentMethod(), e);
+                throw;
             }
         }
 
@@ -73,16 +89,23 @@ namespace me.sibo.fileDog.Service
             {
                 return;
             }
-            using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+            try
             {
-                conn.Open().Wait();
-                string guid = Guid.NewGuid().ToString();
-                conn.Sets.Add(db, guid, fileUrls).Wait();
-                string[] keys = {guid, FilesUrlCachekey};
-                Task<byte[][]> task = conn.Sets.Difference(db, keys);
-                task.Wait();
-                conn.Sets.Add(db, FilesUrlCachekey, task.Result).Wait();
-                conn.Keys.Remove(db, guid); //remove guid cache
+                using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+                {
+                    conn.Open().Wait();
+                    string guid = Guid.NewGuid().ToString();
+                    conn.Sets.Add(DefaultDb, guid, fileUrls).Wait();
+                    string[] keys = {guid, FilesUrlCachekey};
+                    Task<byte[][]> task = conn.Sets.Difference(DefaultDb, keys);
+                    task.Wait();
+                    conn.Sets.Add(DefaultDb, FilesUrlCachekey, task.Result).Wait();
+                    conn.Keys.Remove(DefaultDb, guid); //remove guid cache
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(MethodBase.GetCurrentMethod(),e);
             }
         }
 
@@ -92,17 +115,25 @@ namespace me.sibo.fileDog.Service
         /// <returns></returns>
         public static string PopFileUrl()
         {
-            using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+            try
             {
-                conn.Open().Wait();
-                Task<byte[]> task = conn.Sets.RemoveRandom(db, FilesUrlCachekey);
-                task.Wait();
-                if (task.Result != null && task.Result.Any())
+                using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
                 {
-                    conn.Sets.Add(db, FileUrlChecked, task.Result);
-                    return Encoding.Default.GetString(task.Result);
+                    conn.Open().Wait();
+                    Task<byte[]> task = conn.Sets.RemoveRandom(DefaultDb, FilesUrlCachekey);
+                    task.Wait();
+                    if (task.Result != null && task.Result.Any())
+                    {
+                        conn.Sets.Add(DefaultDb, FileUrlChecked, task.Result);
+                        return Encoding.Default.GetString(task.Result);
+                    }
+                    return string.Empty;
                 }
-                return string.Empty;
+            }
+            catch (Exception e)
+            {
+                Logger.Error(MethodBase.GetCurrentMethod(),e);
+                throw;
             }
         }
 
@@ -111,10 +142,17 @@ namespace me.sibo.fileDog.Service
         /// </summary>
         public static void FlushDb()
         {
-            using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+            try
             {
-                conn.Open().Wait();
-                conn.Server.FlushDb(db).Wait();
+                using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+                {
+                    conn.Open().Wait();
+                    conn.Server.FlushDb(DefaultDb).Wait();
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(MethodBase.GetCurrentMethod(),e);
             }
         }
 
@@ -125,10 +163,17 @@ namespace me.sibo.fileDog.Service
         /// <returns></returns>
         public static void FileDownloaded(string url)
         {
-            using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+            try
             {
-                conn.Open().Wait();
-                conn.Sets.Add(db, FileDownloadedCachekey, url);
+                using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+                {
+                    conn.Open().Wait();
+                    conn.Sets.Add(DefaultDb, FileDownloadedCachekey, url);
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Error(MethodBase.GetCurrentMethod(),e);
             }
         }
 
@@ -138,26 +183,34 @@ namespace me.sibo.fileDog.Service
         /// <returns></returns>
         public static TaskInfo GetTaskStatus()
         {
-            using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
+            try
             {
-                conn.Open().Wait();
-                var taskInfo = new TaskInfo();
-                Task[] tasks =
+                using (RedisConnection conn = RedisConnectionGateway.Current.GetConnection())
                 {
-                    conn.Sets.GetLength(db, UrlsCacheKey).ContinueWith(cont => { taskInfo.UrlCount = cont.Result; }),
-                    conn.Sets.GetLength(db, UrlChecked)
-                        .ContinueWith(cont => { taskInfo.UrlCheckedCount = cont.Result; }),
-                    conn.Sets.GetLength(db, FilesUrlCachekey)
-                        .ContinueWith(cont => { taskInfo.FileUrlCount = cont.Result; }),
-                    conn.Sets.GetLength(db, FileUrlChecked)
-                        .ContinueWith(cont => { taskInfo.FileCheckedCount = cont.Result; }),
-                    conn.Sets.GetLength(db, FileDownloadedCachekey)
-                        .ContinueWith(cont => { taskInfo.DownloadFileCount = cont.Result; })
-                };
+                    conn.Open().Wait();
+                    var taskInfo = new TaskInfo();
+                    Task[] tasks =
+                    {
+                        conn.Sets.GetLength(DefaultDb, UrlsCacheKey).ContinueWith(cont => { taskInfo.UrlCount = cont.Result; }),
+                        conn.Sets.GetLength(DefaultDb, UrlChecked)
+                            .ContinueWith(cont => { taskInfo.UrlCheckedCount = cont.Result; }),
+                        conn.Sets.GetLength(DefaultDb, FilesUrlCachekey)
+                            .ContinueWith(cont => { taskInfo.FileUrlCount = cont.Result; }),
+                        conn.Sets.GetLength(DefaultDb, FileUrlChecked)
+                            .ContinueWith(cont => { taskInfo.FileCheckedCount = cont.Result; }),
+                        conn.Sets.GetLength(DefaultDb, FileDownloadedCachekey)
+                            .ContinueWith(cont => { taskInfo.DownloadFileCount = cont.Result; })
+                    };
 
-                Task.WaitAll(tasks);
-                return taskInfo;
+                    Task.WaitAll(tasks);
+                    return taskInfo;
+                }
             }
+            catch (Exception e)
+            {
+                Logger.Error(MethodBase.GetCurrentMethod(),e);
+            }
+            return null;
         }
     }
 }

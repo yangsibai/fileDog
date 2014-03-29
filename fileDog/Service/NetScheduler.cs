@@ -2,7 +2,7 @@
 {
     public static class NetScheduler
     {
-        private static int _netLimit = 10;
+        private static int _netLimit = 20;
 
         private static readonly object Lock = new object();
 
@@ -12,6 +12,14 @@
         public static int NetCount
         {
             get { return _netLimit; }
+        }
+
+        /// <summary>
+        /// reset net count
+        /// </summary>
+        public static void Reset()
+        {
+            _netLimit = 10;
         }
 
         /// <summary>

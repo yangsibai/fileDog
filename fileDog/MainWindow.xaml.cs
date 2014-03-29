@@ -2,6 +2,8 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Documents;
@@ -17,14 +19,13 @@ namespace me.sibo.fileDog
     /// <summary>
     ///     MainWindow.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : MetroWindow
+    public partial class MainWindow
     {
         private readonly Paragraph _paragraph;
 
         private readonly DispatcherTimer _taskStatusTimer;
         private readonly DispatcherTimer _taskTimer;
         private Process _redisProc;
-        private TaskInfo _taskInfo;
 
         public MainWindow()
         {
@@ -46,9 +47,14 @@ namespace me.sibo.fileDog
             Application.Current.DispatcherUnhandledException += Current_DispatcherUnhandledException;
         }
 
-        void Current_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        /// <summary>
+        /// 捕获未处理的异常
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Current_DispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            ShowMessage(MessageType.Warn,e.Exception.Message);
+            ShowMessage(MessageType.Warn, e.Exception.Message);
         }
 
         /// <summary>
@@ -58,19 +64,29 @@ namespace me.sibo.fileDog
         /// <param name="e"></param>
         private void BeginTask(object sender, EventArgs e)
         {
-            while (_taskInfo != null && NetScheduler.Borrow())
+            while (NetScheduler.Borrow())
             {
-                string url = Redis.PopFileUrl();
-                if (!string.IsNullOrEmpty(url))
+                string url;
+                try
                 {
-                    Task.Factory.StartNew(() => WebResolver.DownloadFile(url))
-                        .ContinueWith(continu =>
-                        {
-                            NetScheduler.Return();
-                            ShowMessage(continu.Result);
-                        }, TaskScheduler.FromCurrentSynchronizationContext());
+                    url = Redis.PopFileUrl();
+                    if (!string.IsNullOrEmpty(url))
+                    {
+                        Task.Factory.StartNew(() => WebResolver.DownloadFile(url))
+                            .ContinueWith(continu =>
+                            {
+                                NetScheduler.Return();
+                                ShowMessage(continu.Result);
+                            }, TaskScheduler.FromCurrentSynchronizationContext());
+                        continue;
+                    }
                 }
-                else
+                catch
+                {
+                    break;
+                }
+
+                try
                 {
                     url = Redis.PopUrl();
                     if (!string.IsNullOrEmpty(url))
@@ -81,14 +97,17 @@ namespace me.sibo.fileDog
                             task.Result.Start();
                             task.Result.ContinueWith(continu => ShowMessage(continu.Result));
                         }, TaskScheduler.FromCurrentSynchronizationContext());
-                    }
-                    else
-                    {
-                        ShowMessage(MessageType.Warn, "没有文章信息也没有文件地址，任务停止");
-                        StopTask();
-                        break;
+                        continue;
                     }
                 }
+                catch
+                {
+                    break;
+                }
+
+                ShowMessage(MessageType.Warn, "没有文章信息也没有文件地址，任务停止");
+                StopTask();
+                break;
             }
         }
 
@@ -101,13 +120,13 @@ namespace me.sibo.fileDog
         {
             Task.Factory.StartNew(() => Redis.GetTaskStatus()).ContinueWith(cont =>
             {
-                _taskInfo = cont.Result;
+                TaskInfo taskInfo = cont.Result;
                 TaskStatusTransition.Content =
                     string.Format(
                         "url:{0}    checkedUrl:{1}    fileUrl:{2}    fileChecked:{3}    fileDownloaded:{4}    net:{5}",
-                        _taskInfo.UrlCount, _taskInfo.UrlCheckedCount, _taskInfo.FileUrlCount,
-                        _taskInfo.FileCheckedCount,
-                        _taskInfo.DownloadFileCount, NetScheduler.NetCount);
+                        taskInfo.UrlCount, taskInfo.UrlCheckedCount, taskInfo.FileUrlCount,
+                        taskInfo.FileCheckedCount,
+                        taskInfo.DownloadFileCount, NetScheduler.NetCount);
             }, TaskScheduler.FromCurrentSynchronizationContext());
         }
 
@@ -154,10 +173,14 @@ namespace me.sibo.fileDog
             StopTask();
         }
 
+        /// <summary>
+        /// stop task
+        /// </summary>
         private void StopTask()
         {
             _taskTimer.Stop();
             _taskStatusTimer.Stop();
+            NetScheduler.Reset();
             ShowMessage(MessageType.Infomation, "停止任务");
         }
 
@@ -191,10 +214,15 @@ namespace me.sibo.fileDog
                 default:
                     bru = Brushes.DarkBlue;
                     break;
-                    ;
             }
 
-            _paragraph.Inlines.Add(new Run(DateTime.Now.ToString("MM-dd HH:mm:ss => ") + String.Join("\t", messages))
+            string message = DateTime.Now.ToString("MM-dd HH:mm:ss => ") + String.Join("\t", messages);
+            new Thread(() => Logger.AppendLog(message)).Start();
+            if (_paragraph.Inlines.Count() >= 1000)
+            {
+                _paragraph.Inlines.Clear();
+            }
+            _paragraph.Inlines.Add(new Run(message)
             {
                 Foreground = bru
             });

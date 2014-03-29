@@ -52,6 +52,11 @@
 			"Extension": ".txt",
 			"IsChecked": true,
 			"Description": "Plain Text File"
+		},{
+			"Name": ".pdf",
+			"Extension": ".pdf",
+			"IsChecked":false,
+			"Description": "Acrobat Portable Document Format"
 		}]
 	}, {
 		"Name": "audio",
